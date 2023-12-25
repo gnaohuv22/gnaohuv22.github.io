@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background: #333;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .board {
+                display: flex;
+                justify-content: center;
+                height: 100vh;
+                margin-top: 7vh;
+                margin-bottom: 20vh;
+            }
+            .mine {
+                background: red;
+            }
+            .number {
+                background: yellow;
+            }
+            .empty {
+                background: green;
+            }
+            .hidden {
+                background: gray;
+            }
+            .flagged {
+                background: orange;
+            }
+            .cell {
+                width: 40px;
+                height: 40px;
+                border: 1px solid black;
+                display: inline-block;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 40px;
+                font-weight: bold;
+                box-sizing: border-box;
+            }
+            .control {
+                position: relative;
+                top: 2vw;
+                left: 2vw;
+                max-width: fit-content;
+            }
+            .timer {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            #reset,
+            #reset-high-score {
+                background: #ccc;
+                padding: 10px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                margin-right: 10px;
+                border-radius: 6px;
+                border: 1px solid coral;
+            }
+
+            #reset:hover,
+            #reset-high-score:hover {
+                background: #666;
+            }
+            #highScore,
+            #timer {
+                background: #ccc;
+                padding: 10px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+            }
+
+            .difficulty {
+                background: #cec;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .difficulty button {
+                border: none;
+                border-radius: 6px;
+                background-color: burlywood;
+                color: rgb(131, 90, 36);
+                padding: 10px;
+                cursor: pointer;
+            }
+
+            .difficulty button:hover {
+                background-color: rgb(160, 132, 96);
+                color: burlywood;
+            }
+
+            .difficulty input {
+                border: none;
+                border-radius: 6px;
+                box-shadow: 1px 1px 2px #eee;
+                padding: 10px;
+                margin-right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="control">
+            <div class="timer">
+                <div id="timer"></div>
+                <div id="highScore"></div>
+                <div id="reset" onclick="resetGame()">Reset Game</div>
+                <div id="reset-high-score" onclick="resetHighScore()">
+                    Reset Highscore
+                </div>
+            </div>
+            <div class="difficulty">
+                <label for="size">Table size</label>
+                <input type="number" id="size" max="30" value="10" />
+
+                <label for="mine">Mine</label>
+                <input type="number" id="mine" max="600" value="10" />
+                <button id="submit" onclick="setValue()">Set</button><br />
+                <div id="errMsg"></div>
+            </div>
+        </div>
+
+        <div class="board">
+            <div id="board"></div>
+        </div>
+
+        <script src="game.js"></script>
+        <script src="playbot.js"></script>
+    </body>
+</html>
