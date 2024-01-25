@@ -1,20 +1,31 @@
 var board = [];
 var size = parseInt(document.getElementById("size").value);
+
 var mineCount = parseInt(document.getElementById("mine").value);
 var startTime;
 var isPlaying = false;
-var highScore = localStorage.getItem("highScore") || Infinity;
-document.getElementById("highScore").textContent = "High score: " + highScore;
+var highScore = localStorage.getItem("highScore") || 0;
+var highScoreDiv = document.getElementById("highScore");
+highScoreDiv.textContent = "Best: " + highScore;
 var timerInterval;
+var intervalId;
+var cellFlagged = 0;
+var cellSuspect = 0;
+
+var loss;
 document.getElementById("size").addEventListener("input", function (e) {
     var max = parseInt(e.target.max);
+    var size = parseInt(document.getElementById("size").value);
+    document.getElementById("mine").value = Math.floor(size * size * 0.2 - (size / 10));
 
     if (e.target.value > max) {
         e.target.value = max;
+        document.getElementById("mine").value = Math.floor(max * max * 0.2 - (size / 10));
     }
 
-    if (e.target.value < 2) {
+    if (e.target.value < 1) {
         e.target.value = 5;
+        document.getElementById("mine").value = Math.floor(5 * 5 * 0.2 - (size / 10));
     }
 });
 
@@ -32,7 +43,7 @@ document.getElementById("mine").addEventListener("input", function (e) {
 
 function setValue() {
     if (isPlaying) {
-        alert("Cannot change value while a game is in progress");
+        alert("Cannot change value while a game is in progress.");
         return;
     }
     // var prevSize = size;
@@ -40,14 +51,19 @@ function setValue() {
     size = parseInt(document.getElementById("size").value);
     mineCount = parseInt(document.getElementById("mine").value);
 
-    document.getElementById("errMsg").innerHTML = "";
-    resetGame();
+    if (size < 5)
+        document.getElementById("errMsg").innerHTML =
+            "Please set size to 5 or greater to setup table.";
+    else {
+        document.getElementById("errMsg").innerHTML = "";
+        resetGame();
+    }
 }
 
 function resetHighScore() {
-    highScore = Infinity;
-    document.getElementById("highScore").textContent =
-        "High score: " + highScore;
+    highScore = 0;
+    localStorage.setItem("highScore", highScore);
+    document.getElementById("highScore").textContent = "Best: " + highScore;
 }
 
 function createBoard() {
@@ -59,6 +75,7 @@ function createBoard() {
                 number: 0,
                 revealed: false,
                 flagged: false,
+                suspect: false,
                 x: i,
                 y: j,
                 id: i + "-" + j,
@@ -122,21 +139,54 @@ function drawBoard() {
                         calculateNumbers();
                         startTimer();
                     }
-                    revealCell(i, j);
-                    drawBoard();
-                    checkWin();
+                    if (board[i][j].flagged) {
+                        board[i][j].flagged = !board[i][j].flagged;
+                    }
+
+
+                    if (!loss) {
+                        revealCell(i, j);
+                        drawBoard();
+                        checkWin();
+                    } else return;
                 };
             })(i, j);
             cell.oncontextmenu = (function (i, j) {
                 return function (e) {
                     e.preventDefault();
-                    board[i][j].flagged = !board[i][j].flagged;
-                    drawBoard();
+                    if (!startTime) {
+                        startTime = new Date();
+                        placeMines(i, j);
+                        calculateNumbers();
+                        startTimer();
+                    } else {
+                        if (!loss) {
+                            if (!board[i][j].flagged && !board[i][j].suspect) {
+                                board[i][j].flagged = true;
+                                ++cellFlagged;
+                            } else if (board[i][j].flagged && !board[i][j].suspect) {
+                                board[i][j].suspect = true;
+                                board[i][j].flagged = false;
+                                --cellFlagged;
+                                ++cellSuspect;
+                            } else if (!board[i][j].flagged && board[i][j].suspect) {
+                                board[i][j].suspect = false;
+                                --cellSuspect;
+                            }
+                            drawBoard();
+                            document.getElementById('cell-flagged').textContent = ' ' + cellFlagged + '/' + mineCount;
+                            document.getElementById('cell-suspected').textContent = ' ' + cellSuspect;
+                        } else return;
+                    }
                 };
             })(i, j);
             if (board[i][j].revealed) {
                 if (board[i][j].mine) {
-                    cell.className = "cell mine";
+                    if (board[i][j].flagged) {
+                        cell.className = "cell true-flag";
+                    } else {
+                        cell.className = "cell mine";
+                    } 
                 } else if (board[i][j].number > 0) {
                     cell.className = "cell number";
                     cell.textContent = board[i][j].number;
@@ -145,6 +195,8 @@ function drawBoard() {
                 }
             } else if (board[i][j].flagged) {
                 cell.className = "cell flagged";
+            } else if (board[i][j].suspect) {
+                cell.className = "cell suspect";
             }
             boardDiv.appendChild(cell);
         }
@@ -189,55 +241,96 @@ function checkWin() {
     if (win) {
         var endTime = new Date();
         var timeTaken = (endTime - startTime) / 1000;
+        var score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
-            alert("You win! Time taken: " + timeTaken + " seconds");
-            if (timeTaken < highScore) {
-                highScore = timeTaken;
+            alert("Congratulation for the winner! Score: " + score);
+            if (score > highScore) {
+                highScore = score;
                 var highScoreDiv = document.getElementById("highScore");
-                var minutes = Math.floor(highScore / 60);
-                var seconds = highScore % 60;
-                highScoreDiv.textContent =
-                    "High score: " + pad(minutes) + ":" + pad(seconds);
+
+                highScoreDiv.textContent = "Best: " + highScore;
                 localStorage.setItem("highScore", highScore);
-                alert("New high score!");
             }
             resetGame();
         }, 100);
     }
+    return win;
 }
 
 function revealMines() {
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            if (board[i][j].mine) {
-                board[i][j].revealed = true;
-            }
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (board[i][j].mine) board[i][j].revealed = true;
         }
     }
 }
 
-function checkLoss() {
-    for (var i = 0; i < size; ++i) {
-        for (var j = 0; j < size; ++j) {
-            if (board[i][j].mine && board[i][j].revealed) {
-                revealMines();
-                drawBoard();
-                setTimeout(function () {
-                    alert("You lost! Clicked on a mine.");
-                    resetGame();
-                }, 100);
-                return;
+function checkFlagged() {
+    var correctCount = 0;
+    for (var i = 0; i < size; i++) {
+        for (var j = 0; j < size; j++) {
+            if (board[i][j].flagged) {
+                if (board[i][j].mine) ++correctCount;
             }
         }
     }
+    return correctCount;
+}
+
+function checkRevealed() {
+    var revealCount = 0;
+    for (var i = 0; i < size; i++) {
+        for (var j = 0; j < size; j++) {
+            if (board[i][j].revealed) ++revealCount;
+        }
+    }
+    return revealCount;
+}
+
+function checkLoss() {
+    loss = false;
+    for (var i = 0; i < size; ++i) {
+        for (var j = 0; j < size; ++j) {
+            if (board[i][j].mine && board[i][j].revealed) {
+                var endTime = new Date();
+                var timeTaken = (endTime - startTime) / 1000;
+                var score = scoreCalculator(timeTaken, false);
+                revealMines();
+                drawBoard();
+                setTimeout(function () {
+                    clearInterval(timerInterval);
+                    clearInterval(intervalId);
+                }, 100);
+                alert("You lost! Score: " + score);
+                if (score > highScore) {
+                    highScore = score;
+                    var highScoreDiv = document.getElementById("highScore");
+
+                    highScoreDiv.textContent = "Best: " + highScore;
+                    localStorage.setItem("highScore", highScore);
+                }
+                loss = true;
+
+                break;
+            }
+        }
+        if (loss) break;
+    }
+    return loss;
 }
 
 function resetGame() {
     clearInterval(timerInterval);
+    clearInterval(intervalId);
     document.getElementById("timer").textContent = "Time: 00:00";
     isPlaying = false;
+    loss = false;
     board = [];
     startTime = null;
+    cellFlagged = 0;
+    cellSuspect = 0;
+    document.getElementById('cell-flagged').textContent = ' ' + cellFlagged + '/' + mineCount;
+    document.getElementById('cell-suspected').textContent = ' ' + cellSuspect;
     createBoard();
     calculateNumbers();
     drawBoard();
@@ -259,4 +352,31 @@ function pad(number) {
     return number < 10 ? "0" + number : number;
 }
 
+function calculateDifficulty(size, mineCount) {
+    return mineCount / (0.2 * size * size);
+}
+
+function scoreCalculator(timeTaken, win) {
+    var cellRevealed = 0;
+    var mineFlagged = 0;
+
+    for (var i = 0; i < size; ++i) {
+        for (var j = 0; j < size; ++j) {
+            if (board[i][j].flagged && board[i][j].mine) ++mineFlagged;
+            if (board[i][j].revealed && !board[i][j].mine) ++cellRevealed;
+        }
+    }
+    var timeBonus = 0;
+    var standardTime = size * size * mineCount / 20;
+    if (win) {
+        timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
+        mineFlagged = mineCount;
+    }
+    var baseScore = cellRevealed * 2 + mineFlagged * 5;
+    var difficultyScore = baseScore * calculateDifficulty(size, mineCount);
+    var totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
+    console.log("timeBonus: " + timeBonus);
+    if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
+    return totalScore;
+}
 resetGame();

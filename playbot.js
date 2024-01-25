@@ -1,130 +1,226 @@
+var openedCells = [
+    {
+        x: 0,
+        y: 0,
+    },
+];
+while (openedCells.length != 0) {
+    openedCells.pop();
+}
+var probability = [[]];
+var dX = [-1, 0, 1, -1, 1, -1, 0, 1];
+var dY = [-1, -1, -1, 0, 0, 1, 1, 1];
+
 function playBot() {
-    var unopenedCells = getUnopenedCells();
-    var constraints = getConstraints();
+    if (checkLoss()) {
+        alert("Please restart the game before let the bot play.");
+        return;
+    }
+    while (openedCells.length != 0) {
+        openedCells.pop();
+    }
+    var x = 1;
+    //  Math.round(Math.random() * board.length);
+    var y = 1;
+    // Math.round(Math.random() * board[0].length);
+    if (!startTime) {
+        startTime = new Date();
+        placeMines(x, y);
+        calculateNumbers();
+        startTimer();
+    }
+    revealCell(x, y);
+    drawBoard();
+    checkWin();
 
-    var assignments = cspSolver(unopenedCells, constraints);
-    if (assignments) {
-        var index = 0;
-        var intervalId = setInterval(function () {
-            var cell = unopenedCells[index];
-            if (assignments[cell.id] === "mine") {
-                cell.flagged = true;
-            } else {
-                revealCell(cell.x, cell.y);
+    // intervalId = setInterval(function () {
+    function spaceKeyDown (e) {
+        if (e.code === "Space") {
+            e.preventDefault();
+            //Set the default probability values
+            for (var i = 0; i < board.length; ++i) {
+                if (probability[i] === undefined) {
+                    probability[i] = [];
+                }
+
+                for (var j = 0; j < board[0].length; ++j) {
+                    if (probability[i][j] === undefined) {
+                        probability[i][j] = -1.0;
+                    }
+                }
             }
-            drawBoard();
-            index++;
-            if (index >= unopenedCells.length) {
+
+            // openedCells.push({ x: 1, y: 1 });
+            for (var i = 0; i < board.length; i++) {
+                for (var j = 0; j < board[0].length; j++) {
+                    if (validMove(i, j)) {
+                        openedCells.push({
+                            x: i,
+                            y: j,
+                        });
+                    }
+                }
+            }
+
+            chooseCellsToReveal();
+            if (checkWin()) {
                 clearInterval(intervalId);
-            }
-        }, 300); // Thay đổi số này để điều chỉnh thời gian trễ
-    }
-}
-
-function getUnopenedCells() {
-    var unopenedCells = [];
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            if (!board[i][j].revealed && !board[i][j].flagged) {
-                unopenedCells.push(board[i][j]);
+                window.removeEventListener('keydown', spaceKeyDown);
+                return;
             }
         }
+        // }, 1000);
     }
-    return unopenedCells;
+
+    window.addEventListener('keydown', spaceKeyDown);
 }
 
-function getSurroundingCells(x, y) {
-    var surroundingCells = [];
-    for (var dx = -1; dx <= 1; dx++) {
-        for (var dy = -1; dy <= 1; dy++) {
-            var newX = x + dx;
-            var newY = y + dy;
-            if (newX >= 0 && newX < size && newY >= 0 && newY < size) {
-                surroundingCells.push(board[newX][newY]);
+function validMove(x, y) {
+    if (!board[x][y].revealed) return false;
+    return (
+        board[x][y].number > 0 && board[x][y].revealed && surroundedCell(x, y)
+    );
+}
+
+function numberRemain(cellX, cellY) {
+    var number = board[cellX][cellY].number;
+    for (var i = 0; i < 8; ++i) {
+        var x = cellX + dX[i];
+        var y = cellY + dY[i];
+        if (x >= 0 && y >= 0 && x < board.length && y < board[0].length) {
+            if (board[x][y].flagged) --number;
+        }
+    }
+    return number;
+}
+
+function chooseCellsToReveal() {
+    for (var cell of openedCells) {
+        var unopenedCount = 0;
+        var flaggedCells = 0;
+        //get flagged cells and unrevealed cells
+        for (var i = 0; i < 8; ++i) {
+            var x = cell.x + dX[i];
+            var y = cell.y + dY[i];
+            if (x >= 0 && y >= 0 && x < board.length && y < board[0].length) {
+                if (!board[x][y].revealed) ++unopenedCount;
+                if (board[x][y].flagged) ++flaggedCells;
             }
         }
-    }
-    return surroundingCells;
-}
 
-function getConstraints() {
-    var constraints = [];
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            if (board[i][j].revealed && board[i][j].number > 0) {
-                var surroundingCells = getSurroundingCells(i, j);
-                constraints.push({
-                    cells: surroundingCells,
-                    count: board[i][j].number,
-                });
-            }
-        }
-    }
-    return constraints;
-}
-
-function cspSolver(variables, constraints) {
-    var assignments = {};
-
-    function backtrack(index) {
-        if (index === variables.length) {
-            return true; // Tất cả các biến đều đã được gán
-        }
-
-        var cell = variables[index];
-
-        for (var value of ["mine", "safe"]) {
-            assignments[cell.id] = value;
-            if (isConsistent(cell, value, assignments, constraints)) {
-                var result = backtrack(index + 1);
-                // console.log(assignments, cell.id);
-                if (result) {
-                    return result;
+        // console.log('chooseCellsToReveal ' + cell.x + ', ' + cell.y);
+        // console.log("flaggedCells", flaggedCells);
+        // console.log("unopenedCount", unopenedCount);
+        //calculate probability of unopened cells
+        var number = numberRemain(cell.x, cell.y);
+        for (var i = 0; i < 8; ++i) {
+            var x = cell.x + dX[i];
+            var y = cell.y + dY[i];
+            if (x >= 0 && y >= 0 && x < board.length && y < board[0].length) {
+                if (!board[x][y].revealed && !board[x][y].flagged) {
+                    probability[x][y] = Math.max(
+                        probability[x][y],
+                        number / (unopenedCount * 1.0)
+                    );
+                    // console.log(
+                    //     "p[" + x + "][" + y + "] = ",
+                    //     probability[x][y]
+                    // );
                 }
             }
         }
-
-        delete assignments[cell.id];
-        return false;
     }
 
-    function isConsistent(cell, value, assignments, constraints) {
-        // Tạo một bản sao của các gán để kiểm tra tính nhất quán
-        var testAssignments = Object.assign({}, assignments);
-        testAssignments[cell.id] = value;
-
-        for (var constraint of constraints) {
-            var mines = 0;
-            for (var constrainedCell of constraint.cells) {
-                if (testAssignments[constrainedCell.id] === "mine") {
-                    mines++;
+    //Get the unopened cells with 0 and 100% probability
+    var opened = false;
+    if (openedCells.length > 0) {
+        for (var i = 0; i < board.length; i++) {
+            for (var j = 0; j < board[0].length; ++j) {
+                var x = i;
+                var y = j;
+                if (probability[x][y] === 0.0) {
+                    revealCell(x, y);
+                    drawBoard();
+                    opened = true;
+                } else if (probability[x][y] === 1.0) {
+                    board[x][y].flagged = true;
+                    drawBoard();
                 }
             }
-            console.log(constraint.count);
-            // Nếu số lượng bom vượt quá số lượng cho phép, gán này không nhất quán
-            if (mines > constraint.count) {
-                return false;
-            }
         }
-
-        // Nếu không có ràng buộc nào bị vi phạm, gán này là nhất quán
-        return true;
+        // console.log("end");
     }
 
-    if (backtrack(0)) {
-        return assignments;
-    } else {
-        return null;
+    //If there are no cells revealed, open the least probability one
+    if (!opened) {
+        var pos = { x: -1, y: -1 };
+        var min = 1;
+        for (var cell of openedCells) {
+            for (var i = 0; i < 8; ++i) {
+                var x = cell.x + dX[i];
+                var y = cell.y + dY[i];
+                if (
+                    x >= 0 &&
+                    y >= 0 &&
+                    x < board.length &&
+                    y < board[0].length &&
+                    !board[x][y].revealed
+                ) {
+                    if (probability[x][y] < min && probability[x][y] !== -1.0) {
+                        min = probability[x][y];
+                        pos.x = x;
+                        pos.y = y;
+                    }
+                }
+            }
+        }
+        console.log("min: ", min);
+        if (pos.x === -1) {
+            pos.x = Math.round(Math.random() * board.length);
+            pos.y = Math.round(Math.random() * board[0].length);
+            while (
+                board[pos.x][pos.y].revealed ||
+                board[pos.x][pos.y].flagged
+            ) {
+                pos.x = Math.round(Math.random() * board.length);
+                pos.y = Math.round(Math.random() * board[0].length);
+            }
+        }
+        console.log(
+            "Chosen: " +
+                pos.x +
+                ", " +
+                pos.y +
+                " with probability " +
+                probability[pos.x][pos.y]
+        );
+        revealCell(pos.x, pos.y);
+        drawBoard();
+        console.log("Clicked on least probability: " + pos.x + ", " + pos.y);
+    }
+
+    opened = false;
+
+    //Remove the cell surrounded by opened/revealed/flagged cells
+    while (openedCells.length != 0) {
+        openedCells.pop();
     }
 }
 
-// if (!startTime) {
-//     startTime = new Date();
-//     placeMines(1, 1);
-//     calculateNumbers();
-//     startTimer();
-// }
-// revealCell(1, 1);
-// drawBoard();
-// checkWin();
+function surroundedCell(posX, posY) {
+    // console.log('pos: ', posX, posY);
+    var count = 0;
+    for (var i = 0; i < 8; ++i) {
+        var x = posX + dX[i];
+        var y = posY + dY[i];
+        // console.log(x, y);
+        if (x < 0 || y < 0 || x >= board.length || y >= board[0].length)
+            ++count;
+        else {
+            if (board[x][y].revealed || board[x][y].flagged) ++count;
+        }
+    }
+    return count;
+}
+
 // playBot();
