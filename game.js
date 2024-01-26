@@ -1,21 +1,37 @@
-var board = [];
-var size = parseInt(document.getElementById("size").value);
+let board = [];
+let size = parseInt(document.getElementById("size").value);
 
-var mineCount = parseInt(document.getElementById("mine").value);
-var startTime;
-var isPlaying = false;
-var highScore = localStorage.getItem("highScore") || 0;
-var highScoreDiv = document.getElementById("highScore");
+let mineCount = parseInt(document.getElementById("mine").value);
+let startTime;
+let isPlaying = false;
+let highScore = localStorage.getItem("highScore") || 0;
+let highScoreDiv = document.getElementById("highScore");
 highScoreDiv.textContent = "Best: " + highScore;
-var timerInterval;
-var intervalId;
-var cellFlagged = 0;
-var cellSuspect = 0;
+let timerInterval;
+let intervalId;
+let cellFlagged = 0;
+let cellSuspect = 0;
 
-var loss;
+let loss;
+
+let lastClickTime = 0;
+const delay = 200; // Time interval in milliseconds
+
+document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+    let currentTime = new Date().getTime();
+    if (currentTime - lastClickTime < delay) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        return false;
+    }
+    lastClickTime = currentTime;
+}, true);
+
+
 document.getElementById("size").addEventListener("input", function (e) {
-    var max = parseInt(e.target.max);
-    var size = parseInt(document.getElementById("size").value);
+    let max = parseInt(e.target.max);
+    let size = parseInt(document.getElementById("size").value);
     document.getElementById("mine").value = Math.floor(size * size * 0.2 - (size / 10));
 
     if (e.target.value > max) {
@@ -30,7 +46,7 @@ document.getElementById("size").addEventListener("input", function (e) {
 });
 
 document.getElementById("mine").addEventListener("input", function (e) {
-    var size = parseInt(document.getElementById("size").value);
+    let size = parseInt(document.getElementById("size").value);
 
     if (e.target.value > size * (size - 1)) {
         e.target.value = size * (size - 1);
@@ -42,34 +58,55 @@ document.getElementById("mine").addEventListener("input", function (e) {
 });
 
 function setValue() {
-    if (isPlaying) {
+    if (!isPlaying || loss) {
+        // let prevSize = size;
+        // let prevMineCount = mineCount;
+        size = parseInt(document.getElementById("size").value);
+        mineCount = parseInt(document.getElementById("mine").value);
+
+        if (size < 5)
+            document.getElementById("errMsg").innerHTML =
+                "Please set size to 5 or greater to setup table.";
+        else {
+            document.getElementById("errMsg").innerHTML = "";
+            resetGame();
+        }
+    }
+    else {
         alert("Cannot change value while a game is in progress.");
         return;
     }
-    // var prevSize = size;
-    // var prevMineCount = mineCount;
-    size = parseInt(document.getElementById("size").value);
-    mineCount = parseInt(document.getElementById("mine").value);
+}
 
-    if (size < 5)
-        document.getElementById("errMsg").innerHTML =
-            "Please set size to 5 or greater to setup table.";
-    else {
-        document.getElementById("errMsg").innerHTML = "";
+function resetValue() {
+    if (!isPlaying || loss) {
+        document.getElementById("size").value = 10;
+        document.getElementById("mine").value = 18;
+        size = 10;
+        mineCount = 18;
         resetGame();
+    } else {
+        alert("Cannot reset value while a game is in progress.");
+        return;
     }
+    
 }
 
 function resetHighScore() {
-    highScore = 0;
-    localStorage.setItem("highScore", highScore);
-    document.getElementById("highScore").textContent = "Best: " + highScore;
+    let password = prompt('Please enter \'developerdeptraivl\' to delete high score.');
+    // confirm('Do you want to reset the high score? This can\'t be undone?');
+    if (password === 'developerdeptraivl') {
+        alert('Reset successful.');
+        highScore = 0;
+        localStorage.setItem("highScore", highScore);
+        document.getElementById("highScore").textContent = "Best: " + highScore;
+    }
 }
 
 function createBoard() {
-    for (var i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
         board[i] = [];
-        for (var j = 0; j < size; j++) {
+        for (let j = 0; j < size; j++) {
             board[i][j] = {
                 mine: false,
                 number: 0,
@@ -85,28 +122,28 @@ function createBoard() {
 }
 
 function placeMines(exceptX, exceptY) {
-    var availableCells = [];
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
+    let availableCells = [];
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (i !== exceptX || j != exceptY) {
                 availableCells.push({ x: i, y: j });
             }
         }
     }
-    for (var i = 0; i < mineCount; i++) {
-        var index = Math.floor(Math.random() * availableCells.length);
-        var cell = availableCells.splice(index, 1)[0];
+    for (let i = 0; i < mineCount; i++) {
+        let index = Math.floor(Math.random() * availableCells.length);
+        let cell = availableCells.splice(index, 1)[0];
         board[cell.x][cell.y].mine = true;
     }
 }
 
 function calculateNumbers() {
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (!board[i][j].mine) {
-                var mines = 0;
-                for (var dx = -1; dx <= 1; dx++) {
-                    for (var dy = -1; dy <= 1; dy++) {
+                let mines = 0;
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
                         if (
                             i + dx >= 0 &&
                             i + dx < size &&
@@ -125,11 +162,11 @@ function calculateNumbers() {
 }
 
 function drawBoard() {
-    var boardDiv = document.getElementById("board");
+    let boardDiv = document.getElementById("board");
     boardDiv.innerHTML = "";
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            var cell = document.createElement("div");
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            let cell = document.createElement("div");
             cell.className = "cell hidden";
             cell.onclick = (function (i, j) {
                 return function () {
@@ -139,9 +176,9 @@ function drawBoard() {
                         calculateNumbers();
                         startTimer();
                     }
-                    if (board[i][j].flagged) {
-                        board[i][j].flagged = !board[i][j].flagged;
-                    }
+                    // if (board[i][j].flagged) {
+                    //     board[i][j].flagged = !board[i][j].flagged;
+                    // }
 
 
                     if (!loss) {
@@ -185,7 +222,7 @@ function drawBoard() {
                     if (board[i][j].flagged) {
                         cell.className = "cell true-flag";
                     } else {
-                        cell.className = "cell mine";
+                        cell.className = "cell mine fa-solid fa-bomb";
                     } 
                 } else if (board[i][j].number > 0) {
                     cell.className = "cell number";
@@ -219,8 +256,8 @@ function revealCell(x, y) {
             return;
         }
         if (board[x][y].number == 0) {
-            for (var dx = -1; dx <= 1; dx++) {
-                for (var dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
                     revealCell(x + dx, y + dy);
                 }
             }
@@ -229,9 +266,9 @@ function revealCell(x, y) {
 }
 
 function checkWin() {
-    var win = true;
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
+    let win = true;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (!board[i][j].mine && !board[i][j].revealed) {
                 win = false;
                 break;
@@ -239,14 +276,14 @@ function checkWin() {
         }
     }
     if (win) {
-        var endTime = new Date();
-        var timeTaken = (endTime - startTime) / 1000;
-        var score = scoreCalculator(timeTaken, win);
+        let endTime = new Date();
+        let timeTaken = (endTime - startTime) / 1000;
+        let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
             if (score > highScore) {
                 highScore = score;
-                var highScoreDiv = document.getElementById("highScore");
+                let highScoreDiv = document.getElementById("highScore");
 
                 highScoreDiv.textContent = "Best: " + highScore;
                 localStorage.setItem("highScore", highScore);
@@ -266,9 +303,9 @@ function revealMines() {
 }
 
 function checkFlagged() {
-    var correctCount = 0;
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
+    let correctCount = 0;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (board[i][j].flagged) {
                 if (board[i][j].mine) ++correctCount;
             }
@@ -278,9 +315,9 @@ function checkFlagged() {
 }
 
 function checkRevealed() {
-    var revealCount = 0;
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
+    let revealCount = 0;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (board[i][j].revealed) ++revealCount;
         }
     }
@@ -289,12 +326,12 @@ function checkRevealed() {
 
 function checkLoss() {
     loss = false;
-    for (var i = 0; i < size; ++i) {
-        for (var j = 0; j < size; ++j) {
+    for (let i = 0; i < size; ++i) {
+        for (let j = 0; j < size; ++j) {
             if (board[i][j].mine && board[i][j].revealed) {
-                var endTime = new Date();
-                var timeTaken = (endTime - startTime) / 1000;
-                var score = scoreCalculator(timeTaken, false);
+                let endTime = new Date();
+                let timeTaken = (endTime - startTime) / 1000;
+                let score = scoreCalculator(timeTaken, false);
                 revealMines();
                 drawBoard();
                 setTimeout(function () {
@@ -304,7 +341,7 @@ function checkLoss() {
                 alert("You lost! Score: " + score);
                 if (score > highScore) {
                     highScore = score;
-                    var highScoreDiv = document.getElementById("highScore");
+                    let highScoreDiv = document.getElementById("highScore");
 
                     highScoreDiv.textContent = "Best: " + highScore;
                     localStorage.setItem("highScore", highScore);
@@ -321,8 +358,9 @@ function checkLoss() {
 
 function resetGame() {
     clearInterval(timerInterval);
+    // showNotification('game started');
     clearInterval(intervalId);
-    document.getElementById("timer").textContent = "Time: 00:00";
+    document.getElementById("timer").innerHTML = '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
     isPlaying = false;
     loss = false;
     board = [];
@@ -339,12 +377,12 @@ function resetGame() {
 function startTimer() {
     isPlaying = true;
     timerInterval = setInterval(function () {
-        var now = new Date();
-        var timeElapsed = Math.floor((now - startTime) / 1000);
-        var minutes = Math.floor(timeElapsed / 60);
-        var seconds = timeElapsed % 60;
-        document.getElementById("timer").textContent =
-            "Time: " + pad(minutes) + ":" + pad(seconds);
+        let now = new Date();
+        let timeElapsed = Math.floor((now - startTime) / 1000);
+        let minutes = Math.floor(timeElapsed / 60);
+        let seconds = timeElapsed % 60;
+        document.getElementById("timer").innerHTML = '<i class="fa-solid fa-stopwatch"></i>' + 
+            " " + pad(minutes) + ":" + pad(seconds);
     }, 1000);
 }
 
@@ -357,26 +395,31 @@ function calculateDifficulty(size, mineCount) {
 }
 
 function scoreCalculator(timeTaken, win) {
-    var cellRevealed = 0;
-    var mineFlagged = 0;
+    let cellRevealed = 0;
+    let mineFlagged = 0;
 
-    for (var i = 0; i < size; ++i) {
-        for (var j = 0; j < size; ++j) {
+    for (let i = 0; i < size; ++i) {
+        for (let j = 0; j < size; ++j) {
             if (board[i][j].flagged && board[i][j].mine) ++mineFlagged;
             if (board[i][j].revealed && !board[i][j].mine) ++cellRevealed;
         }
     }
-    var timeBonus = 0;
-    var standardTime = size * size * mineCount / 20;
+    let timeBonus = 0;
+    let standardTime = size * size * mineCount / 20;
     if (win) {
         timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
         mineFlagged = mineCount;
     }
-    var baseScore = cellRevealed * 2 + mineFlagged * 5;
-    var difficultyScore = baseScore * calculateDifficulty(size, mineCount);
-    var totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
+    let baseScore = cellRevealed * 2 + mineFlagged * 5;
+    let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
+    let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
     console.log("timeBonus: " + timeBonus);
     if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
     return totalScore;
 }
-resetGame();
+window.onload = function() {
+    resetGame();
+};
+
+
+

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Minesweeper v0.8.6 by gnaohuv</title>
+        <title>Minesweeper v0.9 by gnaohuv</title>
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -18,39 +18,46 @@
                 -moz-user-select: none; /* Firefox syntax */
                 -ms-user-select: none; /* IE syntax */
             }
-            i {
-                margin: 10px;
-            }
 
             .board {
                 display: flex;
                 justify-content: center;
                 height: 100vh;
                 margin-top: 7vh;
-                margin-bottom: 20vh;
+                margin-bottom: 7vh;
+                flex-wrap: nowrap;
+                text-wrap: nowrap;
+                overflow: visible;
             }
             .mine {
-                background: rgb(223, 39, 39);
+                background: rgb(184, 44, 44);
+                align-items: center;
+                justify-content: center;
             }
             .number {
-                background: rgb(221, 221, 12);
+                background: rgb(234, 243, 103);
+                font-size: x-large;
             }
             .empty {
-                background: green;
+                background: rgb(54, 160, 54);
             }
             .hidden {
                 background: gray;
             }
+            .hidden:hover {
+                background: rgb(71, 71, 71);
+            }
             .flagged {
-                background: orange;
+                background: rgb(224, 147, 4);;
             }
 
             .suspect {
-                background: aqua;
+                background: #027bc7;
             }
             .true-flag {
                 background: pink;
             }
+
             .cell {
                 width: 35px;
                 height: 35px;
@@ -69,11 +76,12 @@
                 top: 2vw;
                 left: 2vw;
                 max-width: fit-content;
+                align-items: center;
             }
             .timer {
                 display: flex;
                 flex-direction: row;
-                justify-content: space-between;
+                align-items: center;
             }
             #reset,
             #reset-high-score,
@@ -109,7 +117,7 @@
 
             .difficulty button {
                 border: none;
-                border-radius: 6px;
+                border-radius: 10px;
                 background-color: burlywood;
                 color: rgb(131, 90, 36);
                 padding: 10px;
@@ -121,6 +129,19 @@
                 color: burlywood;
             }
 
+            #value-reset {
+                background-color: #1d4c5e;
+                color: #F5F5DC; /* Beige */
+                border: 1px solid #F5F5DC; /* Beige */
+            }
+
+            #value-reset:hover {
+                background-color: #F5F5DC; /* Beige */
+                color: #1d4c5e;
+                border: 1px solid #1d4c5e;
+            }
+
+
             .difficulty input {
                 border: none;
                 border-radius: 6px;
@@ -130,14 +151,52 @@
             }
             .flag,
             .question-mark {
-                margin-left: 20px;
+                margin: 0 10px 0 20px;
+            }
+
+
+            #notification {
+                display: none;
+                min-width: 250px; /* Set a default minimum width */
+                background-color: rgba(
+                    42,
+                    223,
+                    81,
+                    0.8
+                ); /* Black background color */
+                color: #fff; /* White text color */
+                text-align: center; /* Centered text */
+                border-radius: 6px; /* Rounded borders */
+                padding: 16px; /* Padding */
+                position: fixed; /* Sit on top of the screen */
+                z-index: 1; /* Add a z-index if needed */
+                right: 20px; /* 20px from the right */
+                top: 30px; /* 30px from the top */
+            }
+
+            .closebtn {
+                margin-left: 15px;
+                color: #fff;
+                font-weight: bold;
+                float: right;
+                font-size: 22px;
+                line-height: 20px;
+                cursor: pointer;
+                transition: 0.3s;
+                display: block;
+            }
+
+            .closebtn:hover {
+                color: black;
             }
         </style>
     </head>
     <body>
         <div class="control">
             <div class="timer">
-                <div id="timer"></div>
+                <div id="timer">
+                    <i class="fa-solid fa-stopwatch"></i>
+                </div>
                 <div id="highScore"></div>
                 <div id="reset" onclick="resetGame()">Reset Game</div>
                 <div id="reset-high-score" onclick="resetHighScore()">
@@ -149,11 +208,12 @@
             </div>
             <div class="difficulty">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                <input type="number" id="size" max="50" value="10" />
+                <input type="number" id="size" max="75" value="10" />
 
                 <i class="fa-solid fa-bomb"></i>
                 <input type="number" id="mine" value="18" />
                 <button id="submit" onclick="setValue()">Set</button>
+                <button id="value-reset" onclick="resetValue()">Reset</button>
                 <i class="flag fa-solid fa-flag" style="color: #ff0000"></i>
                 <span id="cell-flagged"></span>
                 <i
@@ -169,6 +229,15 @@
             <div id="board"></div>
         </div>
 
+        <div id="notification" class="notification">
+            <span
+                id="closebtn"
+                class="closebtn"
+                onclick="this.parentElement.style.display='none'; this.style.display = 'none';"
+                >&times;</span
+            >
+        </div>
+        <script src="notification.js"></script>
         <script src="game.js"></script>
         <script src="playbot.js"></script>
         <script>
