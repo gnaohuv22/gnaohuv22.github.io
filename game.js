@@ -6,8 +6,7 @@ let startTime;
 let isPlaying = false;
 let highScore = localStorage.getItem("highScore") || 0;
 let highScoreDiv = document.getElementById("highScore");
-let playerName = localStorage.getItem("bestPlayer");
-highScoreDiv.textContent = "Best: " + playerName + "(" + highScore + ")";
+highScoreDiv.textContent = "Best: " + highScore;
 let timerInterval;
 let intervalId;
 let cellFlagged = 0;
@@ -111,7 +110,6 @@ function resetHighScore() {
         localStorage.setItem("highScore", highScore);
         document.getElementById("highScore").textContent = "Best: " + highScore;
         for (var i = 1; i <= 10; ++i) {
-            localStorage.setItem("hofName" + i, '');
             localStorage.setItem("hofScore" + i, '');
         }
     }
@@ -304,15 +302,13 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
-            var name = prompt("Enter your name: ");
-            checkHallOfFame(score, name);
+            checkHallOfFame(score);
             if (score > highScore) {
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
                 highScoreDiv.textContent =
-                    "Best: " + name + " (" + highScore + ")";
+                    "Best: " + highScore;
                 localStorage.setItem("highScore", highScore);
-                localStorage.setItem("bestPlayer", name);
             }
             resetGame();
         }, 100);
@@ -320,23 +316,20 @@ function checkWin() {
     return win;
 }
 
-function addHallOfFame(score, name, pos) {
+function addHallOfFame(score, pos) {
     for (var i = 9; i >= pos; --i) {
-        var playerName = localStorage.getItem("hofName" + i);
         var playerScore = localStorage.getItem("hofScore" + i);
-        localStorage.setItem("hofName" + (i + 1), playerName);
         localStorage.setItem("hofScore" + (i + 1), playerScore);
     }
 
-    localStorage.setItem("hofName" + pos, name);
     localStorage.setItem("hofScore" + pos, score);
 }
 
-function checkHallOfFame(score, name) {
+function checkHallOfFame(score) {
     for (var i = 0; i < 10; ++i) {
         var playerScore = localStorage.getItem("hofScore" + i);
         if (score > playerScore || playerScore === null) {
-            addHallOfFame(score, name, i);
+            addHallOfFame(score, i);
             return;
         }
     }
@@ -387,16 +380,14 @@ function checkLoss() {
                     clearInterval(intervalId);
                 }, 100);
                 alert("You lost! Score: " + score);
-                var name = prompt("Enter your name: ");
-                checkHallOfFame(score, name);
+                checkHallOfFame(score);
                 if (score > highScore) {
                     highScore = score;
                     let highScoreDiv = document.getElementById("highScore");
 
                     highScoreDiv.textContent =
-                        "Best: " + name + " (" + highScore + ")";
+                        "Best: " + highScore;
                     localStorage.setItem("highScore", highScore);
-                    localStorage.setItem("bestPlayer", name);
                 }
                 loss = true;
 
