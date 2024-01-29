@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hall of Fame</title>
+        <style>
+            body {
+                background: #333;
+                font-family: Arial, Helvetica, sans-serif;
+                user-select: none; /* Standard syntax */
+                -webkit-user-select: none; /* Chrome, Safari, and Opera syntax */
+                -moz-user-select: none; /* Firefox syntax */
+                -ms-user-select: none; /* IE syntax */
+            }
+
+            table {
+                position: relative;
+                height: 80vh;
+                margin-top: 7vh;
+                margin-bottom: 10vh;
+                text-wrap: nowrap;
+                overflow: hidden;
+                width: 40vw;
+                text-align: center;
+                left: 30vw;
+                border: none;
+            }
+
+            .other {
+                color: #e0ecde;
+                background: gray;
+            }
+
+            .table-title {
+                background: darkgray;
+                color: #e0ecde;
+                font-weight: bold;
+                font-size: large;
+            }
+            td {
+                border-radius: 6px;
+            }
+
+            .first-place {
+                background: gold;
+                color: black;
+            }
+
+            .second-place {
+                background: silver;
+                color: black;
+            }
+
+            .third-place {
+                background: #CD7F32;
+            }
+
+            .back a {
+                color: #E0ECDE;
+            }
+
+            .back a:hover {
+                color: #2C6975;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="back">
+            <a href="index.html">Back to Game</a>
+        </div>
+        <table id="hof" name="hof">
+            <tr class="table-title">
+                <td>#</td>
+                <td>Player Name</td>
+                <td>Score</td>
+            </tr>
+        </table>
+
+        <script>
+            document.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+            });
+
+            for (var i = 1; i <= 10; ++i) {
+                let name = localStorage.getItem("hofName" + i);
+                let score = localStorage.getItem("hofScore" + i);
+
+                let hofTable = document.getElementById("hof");
+                let row = document.createElement("tr");
+
+                let position = document.createElement("td");
+                position.textContent = i;
+
+                let playerName = document.createElement("td");
+                playerName.textContent = name;
+
+                let playerScore = document.createElement("td");
+                playerScore.textContent = score;
+
+                switch (i) {
+                    case 1:
+                        position.className = "first-place";
+                        playerName.className = "first-place";
+                        playerScore.className = "first-place";
+                        break;
+                    case 2:
+                        position.className = "second-place";
+                        playerName.className = "second-place";
+                        playerScore.className = "second-place";
+                        break;
+                    case 3:
+                        position.className = "third-place";
+                        playerName.className = "third-place";
+                        playerScore.className = "third-place";
+                        break;
+                    default:
+                        position.className = "other";
+                        playerName.className = "other";
+                        playerScore.className = "other";
+                }
+
+                row.appendChild(position);
+                row.appendChild(playerName);
+                row.appendChild(playerScore);
+                hofTable.appendChild(row);
+            }
+        </script>
+    </body>
+</html>

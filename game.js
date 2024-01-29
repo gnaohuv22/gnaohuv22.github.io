@@ -6,7 +6,8 @@ let startTime;
 let isPlaying = false;
 let highScore = localStorage.getItem("highScore") || 0;
 let highScoreDiv = document.getElementById("highScore");
-highScoreDiv.textContent = "Best: " + highScore;
+let playerName = localStorage.getItem("bestPlayer");
+highScoreDiv.textContent = "Best: " + playerName + "(" + highScore + ")";
 let timerInterval;
 let intervalId;
 let cellFlagged = 0;
@@ -17,31 +18,40 @@ let loss;
 let lastClickTime = 0;
 const delay = 200; // Time interval in milliseconds
 
-document.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-    let currentTime = new Date().getTime();
-    if (currentTime - lastClickTime < delay) {
-        event.stopImmediatePropagation();
+document.addEventListener(
+    "contextmenu",
+    function (event) {
         event.preventDefault();
-        return false;
-    }
-    lastClickTime = currentTime;
-}, true);
-
+        let currentTime = new Date().getTime();
+        if (currentTime - lastClickTime < delay) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            return false;
+        }
+        lastClickTime = currentTime;
+    },
+    true
+);
 
 document.getElementById("size").addEventListener("input", function (e) {
     let max = parseInt(e.target.max);
     let size = parseInt(document.getElementById("size").value);
-    document.getElementById("mine").value = Math.floor(size * size * 0.2 - (size / 10));
+    document.getElementById("mine").value = Math.floor(
+        size * size * 0.2 - size / 10
+    );
 
     if (e.target.value > max) {
         e.target.value = max;
-        document.getElementById("mine").value = Math.floor(max * max * 0.2 - (size / 10));
+        document.getElementById("mine").value = Math.floor(
+            max * max * 0.2 - size / 10
+        );
     }
 
     if (e.target.value < 1) {
         e.target.value = 5;
-        document.getElementById("mine").value = Math.floor(5 * 5 * 0.2 - (size / 10));
+        document.getElementById("mine").value = Math.floor(
+            5 * 5 * 0.2 - size / 10
+        );
     }
 });
 
@@ -71,8 +81,7 @@ function setValue() {
             document.getElementById("errMsg").innerHTML = "";
             resetGame();
         }
-    }
-    else {
+    } else {
         alert("Cannot change value while a game is in progress.");
         return;
     }
@@ -89,17 +98,22 @@ function resetValue() {
         alert("Cannot reset value while a game is in progress.");
         return;
     }
-    
 }
 
 function resetHighScore() {
-    let password = prompt('Please enter \'developerdeptraivl\' to delete high score.');
+    let password = prompt(
+        "Please enter password to delete high score."
+    );
     // confirm('Do you want to reset the high score? This can\'t be undone?');
-    if (password === 'developerdeptraivl') {
-        alert('Reset successful.');
+    if (password === "developerdeptraivl") {
+        alert("Reset successful.");
         highScore = 0;
         localStorage.setItem("highScore", highScore);
         document.getElementById("highScore").textContent = "Best: " + highScore;
+        for (var i = 1; i <= 10; ++i) {
+            localStorage.setItem("hofName" + i, '');
+            localStorage.setItem("hofScore" + i, '');
+        }
     }
 }
 
@@ -180,7 +194,6 @@ function drawBoard() {
                     //     board[i][j].flagged = !board[i][j].flagged;
                     // }
 
-
                     if (!loss) {
                         revealCell(i, j);
                         drawBoard();
@@ -201,18 +214,28 @@ function drawBoard() {
                             if (!board[i][j].flagged && !board[i][j].suspect) {
                                 board[i][j].flagged = true;
                                 ++cellFlagged;
-                            } else if (board[i][j].flagged && !board[i][j].suspect) {
+                            } else if (
+                                board[i][j].flagged &&
+                                !board[i][j].suspect
+                            ) {
                                 board[i][j].suspect = true;
                                 board[i][j].flagged = false;
                                 --cellFlagged;
                                 ++cellSuspect;
-                            } else if (!board[i][j].flagged && board[i][j].suspect) {
+                            } else if (
+                                !board[i][j].flagged &&
+                                board[i][j].suspect
+                            ) {
                                 board[i][j].suspect = false;
                                 --cellSuspect;
                             }
                             drawBoard();
-                            document.getElementById('cell-flagged').textContent = ' ' + cellFlagged + '/' + mineCount;
-                            document.getElementById('cell-suspected').textContent = ' ' + cellSuspect;
+                            document.getElementById(
+                                "cell-flagged"
+                            ).textContent = " " + cellFlagged + "/" + mineCount;
+                            document.getElementById(
+                                "cell-suspected"
+                            ).textContent = " " + cellSuspect;
                         } else return;
                     }
                 };
@@ -223,7 +246,7 @@ function drawBoard() {
                         cell.className = "cell true-flag";
                     } else {
                         cell.className = "cell mine fa-solid fa-bomb";
-                    } 
+                    }
                 } else if (board[i][j].number > 0) {
                     cell.className = "cell number";
                     cell.textContent = board[i][j].number;
@@ -281,17 +304,42 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
+            var name = prompt("Enter your name: ");
+            checkHallOfFame(score, name);
             if (score > highScore) {
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
-
-                highScoreDiv.textContent = "Best: " + highScore;
+                highScoreDiv.textContent =
+                    "Best: " + name + " (" + highScore + ")";
                 localStorage.setItem("highScore", highScore);
+                localStorage.setItem("bestPlayer", name);
             }
             resetGame();
         }, 100);
     }
     return win;
+}
+
+function addHallOfFame(score, name, pos) {
+    for (var i = 9; i >= pos; --i) {
+        var playerName = localStorage.getItem("hofName" + i);
+        var playerScore = localStorage.getItem("hofScore" + i);
+        localStorage.setItem("hofName" + (i + 1), playerName);
+        localStorage.setItem("hofScore" + (i + 1), playerScore);
+    }
+
+    localStorage.setItem("hofName" + pos, name);
+    localStorage.setItem("hofScore" + pos, score);
+}
+
+function checkHallOfFame(score, name) {
+    for (var i = 0; i < 10; ++i) {
+        var playerScore = localStorage.getItem("hofScore" + i);
+        if (score > playerScore || playerScore === null) {
+            addHallOfFame(score, name, i);
+            return;
+        }
+    }
 }
 
 function revealMines() {
@@ -339,12 +387,16 @@ function checkLoss() {
                     clearInterval(intervalId);
                 }, 100);
                 alert("You lost! Score: " + score);
+                var name = prompt("Enter your name: ");
+                checkHallOfFame(score, name);
                 if (score > highScore) {
                     highScore = score;
                     let highScoreDiv = document.getElementById("highScore");
 
-                    highScoreDiv.textContent = "Best: " + highScore;
+                    highScoreDiv.textContent =
+                        "Best: " + name + " (" + highScore + ")";
                     localStorage.setItem("highScore", highScore);
+                    localStorage.setItem("bestPlayer", name);
                 }
                 loss = true;
 
@@ -360,15 +412,17 @@ function resetGame() {
     clearInterval(timerInterval);
     // showNotification('game started');
     clearInterval(intervalId);
-    document.getElementById("timer").innerHTML = '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
+    document.getElementById("timer").innerHTML =
+        '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
     isPlaying = false;
     loss = false;
     board = [];
     startTime = null;
     cellFlagged = 0;
     cellSuspect = 0;
-    document.getElementById('cell-flagged').textContent = ' ' + cellFlagged + '/' + mineCount;
-    document.getElementById('cell-suspected').textContent = ' ' + cellSuspect;
+    document.getElementById("cell-flagged").textContent =
+        " " + cellFlagged + "/" + mineCount;
+    document.getElementById("cell-suspected").textContent = " " + cellSuspect;
     createBoard();
     calculateNumbers();
     drawBoard();
@@ -381,8 +435,12 @@ function startTimer() {
         let timeElapsed = Math.floor((now - startTime) / 1000);
         let minutes = Math.floor(timeElapsed / 60);
         let seconds = timeElapsed % 60;
-        document.getElementById("timer").innerHTML = '<i class="fa-solid fa-stopwatch"></i>' + 
-            " " + pad(minutes) + ":" + pad(seconds);
+        document.getElementById("timer").innerHTML =
+            '<i class="fa-solid fa-stopwatch"></i>' +
+            " " +
+            pad(minutes) +
+            ":" +
+            pad(seconds);
     }, 1000);
 }
 
@@ -405,7 +463,7 @@ function scoreCalculator(timeTaken, win) {
         }
     }
     let timeBonus = 0;
-    let standardTime = size * size * mineCount / 20;
+    let standardTime = (size * size * mineCount) / 20;
     if (win) {
         timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
         mineFlagged = mineCount;
@@ -417,9 +475,6 @@ function scoreCalculator(timeTaken, win) {
     if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
     return totalScore;
 }
-window.onload = function() {
+window.onload = function () {
     resetGame();
 };
-
-
-
