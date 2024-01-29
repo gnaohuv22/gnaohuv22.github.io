@@ -34,7 +34,7 @@ function playBot() {
     checkWin();
 
     // intervalId = setInterval(function () {
-    function spaceKeyDown (e) {
+    function spaceKeyDown(e) {
         if (e.code === "Space") {
             e.preventDefault();
             //Set the default probability values
@@ -65,14 +65,14 @@ function playBot() {
             chooseCellsToReveal();
             if (checkWin()) {
                 clearInterval(intervalId);
-                window.removeEventListener('keydown', spaceKeyDown);
+                window.removeEventListener("keydown", spaceKeyDown);
                 return;
             }
         }
         // }, 1000);
     }
 
-    window.addEventListener('keydown', spaceKeyDown);
+    window.addEventListener("keydown", spaceKeyDown);
 }
 
 function validMove(x, y) {

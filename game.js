@@ -100,9 +100,7 @@ function resetValue() {
 }
 
 function resetHighScore() {
-    let password = prompt(
-        "Please enter password to delete high score."
-    );
+    let password = prompt("Please enter password to delete high score.");
     // confirm('Do you want to reset the high score? This can\'t be undone?');
     if (password === "developerdeptraivl") {
         alert("Reset successful.");
@@ -110,7 +108,7 @@ function resetHighScore() {
         localStorage.setItem("highScore", highScore);
         document.getElementById("highScore").textContent = "Best: " + highScore;
         for (var i = 1; i <= 10; ++i) {
-            localStorage.setItem("hofScore" + i, '');
+            localStorage.setItem("hofScore" + i, "");
         }
     }
 }
@@ -306,8 +304,7 @@ function checkWin() {
             if (score > highScore) {
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
-                highScoreDiv.textContent =
-                    "Best: " + highScore;
+                highScoreDiv.textContent = "Best: " + highScore;
                 localStorage.setItem("highScore", highScore);
             }
             resetGame();
@@ -385,8 +382,7 @@ function checkLoss() {
                     highScore = score;
                     let highScoreDiv = document.getElementById("highScore");
 
-                    highScoreDiv.textContent =
-                        "Best: " + highScore;
+                    highScoreDiv.textContent = "Best: " + highScore;
                     localStorage.setItem("highScore", highScore);
                 }
                 loss = true;

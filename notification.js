@@ -4,8 +4,8 @@ function showNotification(msg) {
     notification.style.display = "block";
     // closebtn.style.display = "block";
     notification.textContent = msg;
-    setTimeout(function(){ 
-        notification.style.display = "none"; 
+    setTimeout(function () {
+        notification.style.display = "none";
         // closebtn.style.display = "none";
     }, 5000);
 }
