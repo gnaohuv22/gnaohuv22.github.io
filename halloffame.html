@@ -70,7 +70,6 @@
         <table id="hof" name="hof">
             <tr class="table-title">
                 <td>#</td>
-                <td>Player Name</td>
                 <td>Score</td>
             </tr>
         </table>
@@ -81,7 +80,6 @@
             });
 
             for (var i = 1; i <= 10; ++i) {
-                let name = localStorage.getItem("hofName" + i);
                 let score = localStorage.getItem("hofScore" + i);
 
                 let hofTable = document.getElementById("hof");
@@ -90,36 +88,28 @@
                 let position = document.createElement("td");
                 position.textContent = i;
 
-                let playerName = document.createElement("td");
-                playerName.textContent = name;
-
                 let playerScore = document.createElement("td");
                 playerScore.textContent = score;
 
                 switch (i) {
                     case 1:
                         position.className = "first-place";
-                        playerName.className = "first-place";
                         playerScore.className = "first-place";
                         break;
                     case 2:
-                        position.className = "second-place";
                         playerName.className = "second-place";
                         playerScore.className = "second-place";
                         break;
                     case 3:
                         position.className = "third-place";
-                        playerName.className = "third-place";
                         playerScore.className = "third-place";
                         break;
                     default:
                         position.className = "other";
-                        playerName.className = "other";
                         playerScore.className = "other";
                 }
 
                 row.appendChild(position);
-                row.appendChild(playerName);
                 row.appendChild(playerScore);
                 hofTable.appendChild(row);
             }
