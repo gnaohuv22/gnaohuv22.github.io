@@ -109,6 +109,8 @@ function resetHighScore() {
         document.getElementById("highScore").textContent = "Best: " + highScore;
         for (var i = 1; i <= 10; ++i) {
             localStorage.setItem("hofScore" + i, "");
+            localStorage.setItem("hofTime" + i, "");
+            localStorage.setItem("hofState" + i, "");
         }
     }
 }
