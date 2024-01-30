@@ -300,7 +300,7 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
-            checkHallOfFame(score);
+            checkHallOfFame(score, timeTaken, 'W');
             if (score > highScore) {
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
@@ -313,20 +313,30 @@ function checkWin() {
     return win;
 }
 
-function addHallOfFame(score, pos) {
+function addHallOfFame(score, pos, timeTaken, win) {
     for (var i = 9; i >= pos; --i) {
         var playerScore = localStorage.getItem("hofScore" + i);
+        var time = localStorage.getItem("hofTime" + i);
+        var state = localStorage.getItem("hofState" + i);
         localStorage.setItem("hofScore" + (i + 1), playerScore);
+        localStorage.setItem("hofTime" + (i + 1), time);
+        localStorage.setItem("hofState" + (i + 1), state);
     }
 
     localStorage.setItem("hofScore" + pos, score);
+    localStorage.setItem("hofTime" + pos, timeTaken);
+    localStorage.setItem("hofState" + pos, win);
 }
 
-function checkHallOfFame(score) {
+function checkHallOfFame(score, timeTaken, win) {
     for (var i = 1; i <= 10; ++i) {
         var playerScore = localStorage.getItem("hofScore" + i);
+        var time = localStorage.getItem("hofTime" + i);
         if (score > playerScore || playerScore === null) {
-            addHallOfFame(score, i);
+            addHallOfFame(score, i, timeTaken, win);
+            return;
+        } else if (score === playerScore && timeTaken < time) {
+            addHallOfFame(score, i, timeTaken, win);
             return;
         }
     }
@@ -377,7 +387,7 @@ function checkLoss() {
                     clearInterval(intervalId);
                 }, 100);
                 alert("You lost! Score: " + score);
-                checkHallOfFame(score);
+                checkHallOfFame(score, timeTaken, 'L');
                 if (score > highScore) {
                     highScore = score;
                     let highScoreDiv = document.getElementById("highScore");
