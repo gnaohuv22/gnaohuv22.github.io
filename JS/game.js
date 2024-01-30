@@ -1,18 +1,19 @@
 let board = [];
 let size = parseInt(document.getElementById("size").value);
-
 let mineCount = parseInt(document.getElementById("mine").value);
 let startTime;
-let isPlaying = false;
-let highScore = localStorage.getItem("highScore") || 0;
-let highScoreDiv = document.getElementById("highScore");
-highScoreDiv.textContent = "Best: " + highScore;
 let timerInterval;
 let intervalId;
+
+let isPlaying = false;
 let cellFlagged = 0;
 let cellSuspect = 0;
 
 let loss;
+
+let highScore = localStorage.getItem("highScore") || 0;
+let highScoreDiv = document.getElementById("highScore");
+highScoreDiv.textContent = "Best: " + highScore;
 
 let lastClickTime = 0;
 const delay = 200; // Time interval in milliseconds
@@ -115,6 +116,26 @@ function resetHighScore() {
     }
 }
 
+function resetGame() {
+    clearInterval(timerInterval);
+    // showNotification('game started');
+    clearInterval(intervalId);
+    document.getElementById("timer").innerHTML =
+        '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
+    isPlaying = false;
+    loss = false;
+    board = [];
+    startTime = null;
+    cellFlagged = 0;
+    cellSuspect = 0;
+    document.getElementById("cell-flagged").textContent =
+        " " + cellFlagged + "/" + mineCount;
+    document.getElementById("cell-suspected").textContent = " " + cellSuspect;
+    createBoard();
+    calculateNumbers();
+    drawBoard();
+}
+
 function createBoard() {
     for (let i = 0; i < size; i++) {
         board[i] = [];
@@ -171,6 +192,26 @@ function calculateNumbers() {
             }
         }
     }
+}
+
+function startTimer() {
+    isPlaying = true;
+    timerInterval = setInterval(function () {
+        let now = new Date();
+        let timeElapsed = Math.floor((now - startTime) / 1000);
+        let minutes = Math.floor(timeElapsed / 60);
+        let seconds = timeElapsed % 60;
+        document.getElementById("timer").innerHTML =
+            '<i class="fa-solid fa-stopwatch"></i>' +
+            " " +
+            pad(minutes) +
+            ":" +
+            pad(seconds);
+    }, 1000);
+}
+
+function pad(number) {
+    return number < 10 ? "0" + number : number;
 }
 
 function drawBoard() {
@@ -286,6 +327,64 @@ function revealCell(x, y) {
     }
 }
 
+function checkFlagged() {
+    let correctCount = 0;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (board[i][j].flagged) {
+                if (board[i][j].mine) ++correctCount;
+            }
+        }
+    }
+    return correctCount;
+}
+
+function checkRevealed() {
+    let revealCount = 0;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (board[i][j].revealed) ++revealCount;
+        }
+    }
+    return revealCount;
+}
+
+function revealMines() {
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (board[i][j].mine) board[i][j].revealed = true;
+        }
+    }
+}
+
+function calculateDifficulty(size, mineCount) {
+    return mineCount / (0.2 * size * size);
+}
+
+function scoreCalculator(timeTaken, win) {
+    let cellRevealed = 0;
+    let mineFlagged = 0;
+
+    for (let i = 0; i < size; ++i) {
+        for (let j = 0; j < size; ++j) {
+            if (board[i][j].flagged && board[i][j].mine) ++mineFlagged;
+            if (board[i][j].revealed && !board[i][j].mine) ++cellRevealed;
+        }
+    }
+    let timeBonus = 0;
+    let standardTime = (size * size * mineCount) / 20;
+    if (win) {
+        timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
+        mineFlagged = mineCount;
+    }
+    let baseScore = cellRevealed * 2 + mineFlagged * 5;
+    let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
+    let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
+    console.log("timeBonus: " + timeBonus);
+    if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
+    return totalScore;
+}
+
 function checkWin() {
     let win = true;
     for (let i = 0; i < size; i++) {
@@ -302,7 +401,7 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
-            checkHallOfFame(score, timeTaken, 'W');
+            checkHallOfFame(score, timeTaken, "W");
             if (score > highScore) {
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
@@ -313,6 +412,39 @@ function checkWin() {
         }, 100);
     }
     return win;
+}
+
+function checkLoss() {
+    loss = false;
+    for (let i = 0; i < size; ++i) {
+        for (let j = 0; j < size; ++j) {
+            if (board[i][j].mine && board[i][j].revealed) {
+                let endTime = new Date();
+                let timeTaken = (endTime - startTime) / 1000;
+                let score = scoreCalculator(timeTaken, false);
+                revealMines();
+                drawBoard();
+                setTimeout(function () {
+                    clearInterval(timerInterval);
+                    clearInterval(intervalId);
+                }, 100);
+                alert("You lost! Score: " + score);
+                checkHallOfFame(score, timeTaken, "L");
+                if (score > highScore) {
+                    highScore = score;
+                    let highScoreDiv = document.getElementById("highScore");
+
+                    highScoreDiv.textContent = "Best: " + highScore;
+                    localStorage.setItem("highScore", highScore);
+                }
+                loss = true;
+
+                break;
+            }
+        }
+        if (loss) break;
+    }
+    return loss;
 }
 
 function addHallOfFame(score, pos, timeTaken, win) {
@@ -344,136 +476,8 @@ function checkHallOfFame(score, timeTaken, win) {
     }
 }
 
-function revealMines() {
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (board[i][j].mine) board[i][j].revealed = true;
-        }
-    }
-}
 
-function checkFlagged() {
-    let correctCount = 0;
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (board[i][j].flagged) {
-                if (board[i][j].mine) ++correctCount;
-            }
-        }
-    }
-    return correctCount;
-}
 
-function checkRevealed() {
-    let revealCount = 0;
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (board[i][j].revealed) ++revealCount;
-        }
-    }
-    return revealCount;
-}
-
-function checkLoss() {
-    loss = false;
-    for (let i = 0; i < size; ++i) {
-        for (let j = 0; j < size; ++j) {
-            if (board[i][j].mine && board[i][j].revealed) {
-                let endTime = new Date();
-                let timeTaken = (endTime - startTime) / 1000;
-                let score = scoreCalculator(timeTaken, false);
-                revealMines();
-                drawBoard();
-                setTimeout(function () {
-                    clearInterval(timerInterval);
-                    clearInterval(intervalId);
-                }, 100);
-                alert("You lost! Score: " + score);
-                checkHallOfFame(score, timeTaken, 'L');
-                if (score > highScore) {
-                    highScore = score;
-                    let highScoreDiv = document.getElementById("highScore");
-
-                    highScoreDiv.textContent = "Best: " + highScore;
-                    localStorage.setItem("highScore", highScore);
-                }
-                loss = true;
-
-                break;
-            }
-        }
-        if (loss) break;
-    }
-    return loss;
-}
-
-function resetGame() {
-    clearInterval(timerInterval);
-    // showNotification('game started');
-    clearInterval(intervalId);
-    document.getElementById("timer").innerHTML =
-        '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
-    isPlaying = false;
-    loss = false;
-    board = [];
-    startTime = null;
-    cellFlagged = 0;
-    cellSuspect = 0;
-    document.getElementById("cell-flagged").textContent =
-        " " + cellFlagged + "/" + mineCount;
-    document.getElementById("cell-suspected").textContent = " " + cellSuspect;
-    createBoard();
-    calculateNumbers();
-    drawBoard();
-}
-
-function startTimer() {
-    isPlaying = true;
-    timerInterval = setInterval(function () {
-        let now = new Date();
-        let timeElapsed = Math.floor((now - startTime) / 1000);
-        let minutes = Math.floor(timeElapsed / 60);
-        let seconds = timeElapsed % 60;
-        document.getElementById("timer").innerHTML =
-            '<i class="fa-solid fa-stopwatch"></i>' +
-            " " +
-            pad(minutes) +
-            ":" +
-            pad(seconds);
-    }, 1000);
-}
-
-function pad(number) {
-    return number < 10 ? "0" + number : number;
-}
-
-function calculateDifficulty(size, mineCount) {
-    return mineCount / (0.2 * size * size);
-}
-
-function scoreCalculator(timeTaken, win) {
-    let cellRevealed = 0;
-    let mineFlagged = 0;
-
-    for (let i = 0; i < size; ++i) {
-        for (let j = 0; j < size; ++j) {
-            if (board[i][j].flagged && board[i][j].mine) ++mineFlagged;
-            if (board[i][j].revealed && !board[i][j].mine) ++cellRevealed;
-        }
-    }
-    let timeBonus = 0;
-    let standardTime = (size * size * mineCount) / 20;
-    if (win) {
-        timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
-        mineFlagged = mineCount;
-    }
-    let baseScore = cellRevealed * 2 + mineFlagged * 5;
-    let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
-    let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
-    console.log("timeBonus: " + timeBonus);
-    if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
-    return totalScore;
-}
 window.onload = function () {
     resetGame();
 };
