@@ -87,8 +87,8 @@
             });
 
             function convertTime(time) {
-                let minutes = time / 60;
-                let seconds = time % 60;
+                let minutes = Math.floor(time / 60);
+                let seconds = Math.round(time % 60);
                 return minutes + "m" + seconds + "s";
             }
 
