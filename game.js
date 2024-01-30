@@ -323,7 +323,7 @@ function addHallOfFame(score, pos) {
 }
 
 function checkHallOfFame(score) {
-    for (var i = 0; i < 10; ++i) {
+    for (var i = 1; i <= 10; ++i) {
         var playerScore = localStorage.getItem("hofScore" + i);
         if (score > playerScore || playerScore === null) {
             addHallOfFame(score, i);
