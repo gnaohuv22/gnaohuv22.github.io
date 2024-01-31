@@ -288,7 +288,7 @@ function drawBoard() {
             if (board[i][j].revealed) {
                 if (board[i][j].mine) {
                     if (board[i][j].flagged) {
-                        cell.className = "cell true-flag";
+                        cell.className = "cell true-flag fa-solid fa-check fa-xl";
                     } else {
                         cell.className = "cell mine fa-solid fa-bomb";
                     }
@@ -299,9 +299,9 @@ function drawBoard() {
                     cell.className = "cell empty";
                 }
             } else if (board[i][j].flagged) {
-                cell.className = "cell flagged fa-solid fa-flag";
+                cell.className = "cell flagged fa-solid fa-flag fa-lg";
             } else if (board[i][j].suspect) {
-                cell.className = "cell suspect";
+                cell.className = "cell suspect fa-solid fa-question fa-lg";
             }
             boardDiv.appendChild(cell);
         }

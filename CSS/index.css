@@ -40,14 +40,22 @@ body {
 }
 
 .flagged.fa-flag {
-    color: #8accff;
+    color: rgb(31, 108, 251);
 }
 
 .suspect {
     background: #027bc7;
 }
+
+.suspect.fa-question {
+    color: #FD8438;
+}
 .true-flag {
     background: pink;
+}
+
+.true-flag.fa-check {
+    color: #003F34;
 }
 
 .cell {
