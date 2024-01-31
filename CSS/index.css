@@ -39,6 +39,10 @@ body {
     background: rgb(224, 147, 4);
 }
 
+.flagged.fa-flag {
+    color: #8accff;
+}
+
 .suspect {
     background: #027bc7;
 }

@@ -253,14 +253,14 @@ function drawBoard() {
                             if (
                                 !board[i][j].flagged &&
                                 !board[i][j].suspect &&
-                                board[i][j].number === 0
+                                !board[i][j].revealed
                             ) {
                                 board[i][j].flagged = true;
                                 ++cellFlagged;
                             } else if (
                                 board[i][j].flagged &&
                                 !board[i][j].suspect &&
-                                board[i][j].number === 0
+                                !board[i][j].revealed
                             ) {
                                 board[i][j].suspect = true;
                                 board[i][j].flagged = false;
@@ -269,7 +269,7 @@ function drawBoard() {
                             } else if (
                                 !board[i][j].flagged &&
                                 board[i][j].suspect &&
-                                board[i][j].number === 0
+                                !board[i][j].revealed
                             ) {
                                 board[i][j].suspect = false;
                                 --cellSuspect;
@@ -299,7 +299,7 @@ function drawBoard() {
                     cell.className = "cell empty";
                 }
             } else if (board[i][j].flagged) {
-                cell.className = "cell flagged";
+                cell.className = "cell flagged fa-solid fa-flag";
             } else if (board[i][j].suspect) {
                 cell.className = "cell suspect";
             }
