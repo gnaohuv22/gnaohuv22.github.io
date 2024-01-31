@@ -383,7 +383,7 @@ function scoreCalculator(timeTaken, win) {
         timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
         mineFlagged = mineCount;
     }
-    let baseScore = (cellRevealed * 2 + mineFlagged * 5) * ((mineCount / (size * size)) / 0.18);
+    let baseScore = (cellRevealed * 2 + mineFlagged * 5);
     let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
     let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
     console.log("timeBonus: " + timeBonus);
