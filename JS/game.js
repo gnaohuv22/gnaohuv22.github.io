@@ -250,12 +250,17 @@ function drawBoard() {
                         startTimer();
                     } else {
                         if (!loss) {
-                            if (!board[i][j].flagged && !board[i][j].suspect) {
+                            if (
+                                !board[i][j].flagged &&
+                                !board[i][j].suspect &&
+                                board[i][j].number === 0
+                            ) {
                                 board[i][j].flagged = true;
                                 ++cellFlagged;
                             } else if (
                                 board[i][j].flagged &&
-                                !board[i][j].suspect
+                                !board[i][j].suspect &&
+                                board[i][j].number === 0
                             ) {
                                 board[i][j].suspect = true;
                                 board[i][j].flagged = false;
@@ -263,7 +268,8 @@ function drawBoard() {
                                 ++cellSuspect;
                             } else if (
                                 !board[i][j].flagged &&
-                                board[i][j].suspect
+                                board[i][j].suspect &&
+                                board[i][j].number === 0
                             ) {
                                 board[i][j].suspect = false;
                                 --cellSuspect;
@@ -475,8 +481,6 @@ function checkHallOfFame(score, timeTaken, win) {
         }
     }
 }
-
-
 
 window.onload = function () {
     resetGame();
