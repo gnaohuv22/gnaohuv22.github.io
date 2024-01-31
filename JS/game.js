@@ -58,8 +58,8 @@ document.getElementById("size").addEventListener("input", function (e) {
 document.getElementById("mine").addEventListener("input", function (e) {
     let size = parseInt(document.getElementById("size").value);
 
-    if (e.target.value > size * size * 0.22) {
-        e.target.value = size * size * 0.22
+    if (e.target.value > Math.round(size * size * 0.22)) {
+        e.target.value = Math.round(size * size * 0.22);
     }
 
     if (e.target.value == 0) {
