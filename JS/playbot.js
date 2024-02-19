@@ -12,7 +12,7 @@ var dX = [-1, 0, 1, -1, 1, -1, 0, 1];
 var dY = [-1, -1, -1, 0, 0, 1, 1, 1];
 
 function playBot() {
-    if (checkLoss() || startTime) {
+    if (checkLossWithoutAlert() || startTime) {
         alert("Please restart the game before let the bot play.");
         return;
     }
@@ -69,7 +69,7 @@ function playBot() {
                 return;
             }
         // }
-    }, 300);
+    }, 700);
     // }
 
     // window.addEventListener("keydown", spaceKeyDown);
