@@ -19,15 +19,14 @@ function playBot() {
     while (openedCells.length != 0) {
         openedCells.pop();
     }
-    var x =
-      Math.round(Math.random() * board.length);
-    var y = 
-     Math.round(Math.random() * board[0].length);
+    var x = Math.round(Math.random() * board.length);
+    var y = Math.round(Math.random() * board[0].length);
     if (!startTime) {
         startTime = new Date();
         placeMines(x, y);
         calculateNumbers();
         startTimer();
+        botPlaying = true;
     }
     revealCell(x, y);
     drawBoard();
@@ -36,40 +35,40 @@ function playBot() {
     intervalId = setInterval(function () {
         // function spaceKeyDown(e) {
         // if (e.code === "Space") {
-            // e.preventDefault();
-            //Set the default probability values
-            for (var i = 0; i < board.length; ++i) {
-                // if (probability[i] === undefined) {
-                probability[i] = [];
-                // }
+        // e.preventDefault();
+        //Set the default probability values
+        for (var i = 0; i < board.length; ++i) {
+            // if (probability[i] === undefined) {
+            probability[i] = [];
+            // }
 
-                for (var j = 0; j < board[0].length; ++j) {
-                    if (probability[i][j] === undefined) {
-                        probability[i][j] = 0.0;
-                    }
+            for (var j = 0; j < board[0].length; ++j) {
+                if (probability[i][j] === undefined) {
+                    probability[i][j] = 0.0;
                 }
             }
+        }
 
-            // openedCells.push({ x: 1, y: 1 });
-            for (var i = 0; i < board.length; i++) {
-                for (var j = 0; j < board[0].length; j++) {
-                    if (isOpenedCells(i, j)) {
-                        openedCells.push({
-                            x: i,
-                            y: j,
-                        });
-                    }
+        // openedCells.push({ x: 1, y: 1 });
+        for (var i = 0; i < board.length; i++) {
+            for (var j = 0; j < board[0].length; j++) {
+                if (isOpenedCells(i, j)) {
+                    openedCells.push({
+                        x: i,
+                        y: j,
+                    });
                 }
             }
+        }
 
-            makeDecision();
-            if (checkWin() || checkLossWithoutAlert()) {
-                clearInterval(intervalId);
-                // window.removeEventListener("keydown", spaceKeyDown);
-                return;
-            }
+        makeDecision();
+        if (checkWin() || checkLossWithoutAlert()) {
+            clearInterval(intervalId);
+            // window.removeEventListener("keydown", spaceKeyDown);
+            return;
+        }
         // }
-    }, 700);
+    }, 250);
     // }
 
     // window.addEventListener("keydown", spaceKeyDown);
@@ -197,6 +196,13 @@ function makeDecision() {
     }
 
     //If there are no cells revealed, open the least probability one
+    var minProbCells = [
+        {
+            x: -1,
+            y: -1,
+        },
+    ];
+    minProbCells.pop();
     if (!opened) {
         var pos = { x: -1, y: -1 };
         var min = 1;
@@ -211,36 +217,35 @@ function makeDecision() {
                     y < board[0].length &&
                     !board[x][y].revealed
                 ) {
+                    if (probability[x][y] === min) {
+                        minProbCells.push({ x: x, y: y });
+                    }
                     if (probability[x][y] < min && probability[x][y] !== 0.0) {
+                        while (minProbCells.length != 0) minProbCells.pop();
                         min = probability[x][y];
-                        pos.x = x;
-                        pos.y = y;
+                        minProbCells.push({ x: x, y: y });
                     }
                 }
             }
         }
-        console.log("min: ", min);
-        if (pos.x === -1) {
-            pos.x = Math.round(Math.random() * board.length);
-            pos.y = Math.round(Math.random() * board[0].length);
+        if (minProbCells.length === 0) {
+            pos.x = Math.round(Math.random() * (board.length - 1));
+            pos.y = Math.round(Math.random() * (board[0].length - 1));
             while (
                 board[pos.x][pos.y].revealed ||
                 board[pos.x][pos.y].flagged
             ) {
-                pos.x = Math.round(Math.random() * board.length);
-                pos.y = Math.round(Math.random() * board[0].length);
+                pos.x = Math.round(Math.random() * (board.length - 1));
+                pos.y = Math.round(Math.random() * (board[0].length - 1));
             }
+        } else {
+            var index = Math.round(Math.random() * (minProbCells.length - 1));
+            revealCell(minProbCells[index].x, minProbCells[index].y);
+            console.log(Math.random() * (minProbCells.length - 1));
+            console.log('minProbCells.length: ', minProbCells.length);
         }
-        console.log(probability);
-        console.log(
-            "Chosen: " +
-                pos.x +
-                ", " +
-                pos.y +
-                " with probability " +
-                probability[pos.x][pos.y]
-        );
-        revealCell(pos.x, pos.y);
+        // console.log(probability);
+
         drawBoard();
     }
 

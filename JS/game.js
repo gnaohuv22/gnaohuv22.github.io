@@ -8,6 +8,7 @@ let intervalId;
 let isPlaying = false;
 let cellFlagged = 0;
 let cellSuspect = 0;
+let botPlaying = false;
 
 let loss;
 
@@ -128,6 +129,7 @@ function resetGame() {
     startTime = null;
     cellFlagged = 0;
     cellSuspect = 0;
+    botPlaying = false;
     document.getElementById("cell-flagged").textContent =
         " " + cellFlagged + "/" + mineCount;
     document.getElementById("cell-suspected").textContent = " " + cellSuspect;
@@ -222,74 +224,78 @@ function drawBoard() {
         for (let j = 0; j < size; j++) {
             let cell = document.createElement("div");
             cell.className = "cell hidden";
-            cell.onclick = (function (i, j) {
-                return function () {
-                    if (!startTime) {
-                        startTime = new Date();
-                        placeMines(i, j);
-                        calculateNumbers();
-                        startTimer();
-                    }
-                    // if (board[i][j].flagged) {
-                    //     board[i][j].flagged = !board[i][j].flagged;
-                    // }
+            if (!botPlaying) {
+                cell.onclick = (function (i, j) {
+                    return function () {
+                        if (!startTime) {
+                            startTime = new Date();
+                            placeMines(i, j);
+                            calculateNumbers();
+                            startTimer();
+                        }
+                        // if (board[i][j].flagged) {
+                        //     board[i][j].flagged = !board[i][j].flagged;
+                        // }
 
-                    if (!loss) {
-                        revealCell(i, j);
-                        drawBoard();
-                        checkWin();
-                    } else return;
-                };
-            })(i, j);
-            cell.oncontextmenu = (function (i, j) {
-                return function (e) {
-                    e.preventDefault();
-                    if (!startTime) {
-                        startTime = new Date();
-                        placeMines(i, j);
-                        calculateNumbers();
-                        startTimer();
-                    } else {
                         if (!loss) {
-                            if (
-                                !board[i][j].flagged &&
-                                !board[i][j].suspect &&
-                                !board[i][j].revealed
-                            ) {
-                                board[i][j].flagged = true;
-                                ++cellFlagged;
-                            } else if (
-                                board[i][j].flagged &&
-                                !board[i][j].suspect &&
-                                !board[i][j].revealed
-                            ) {
-                                board[i][j].suspect = true;
-                                board[i][j].flagged = false;
-                                --cellFlagged;
-                                ++cellSuspect;
-                            } else if (
-                                !board[i][j].flagged &&
-                                board[i][j].suspect &&
-                                !board[i][j].revealed
-                            ) {
-                                board[i][j].suspect = false;
-                                --cellSuspect;
-                            }
+                            revealCell(i, j);
                             drawBoard();
-                            window.getElementById(
-                                "cell-flagged"
-                            ).textContent = " " + cellFlagged + "/" + mineCount;
-                            window.getElementById(
-                                "cell-suspected"
-                            ).textContent = " " + cellSuspect;
+                            checkWin();
                         } else return;
-                    }
-                };
-            })(i, j);
+                    };
+                })(i, j);
+                cell.oncontextmenu = (function (i, j) {
+                    return function (e) {
+                        e.preventDefault();
+                        if (!startTime) {
+                            startTime = new Date();
+                            placeMines(i, j);
+                            calculateNumbers();
+                            startTimer();
+                        } else {
+                            if (!loss) {
+                                if (
+                                    !board[i][j].flagged &&
+                                    !board[i][j].suspect &&
+                                    !board[i][j].revealed
+                                ) {
+                                    board[i][j].flagged = true;
+                                    ++cellFlagged;
+                                } else if (
+                                    board[i][j].flagged &&
+                                    !board[i][j].suspect &&
+                                    !board[i][j].revealed
+                                ) {
+                                    board[i][j].suspect = true;
+                                    board[i][j].flagged = false;
+                                    --cellFlagged;
+                                    ++cellSuspect;
+                                } else if (
+                                    !board[i][j].flagged &&
+                                    board[i][j].suspect &&
+                                    !board[i][j].revealed
+                                ) {
+                                    board[i][j].suspect = false;
+                                    --cellSuspect;
+                                }
+                                drawBoard();
+                                window.getElementById(
+                                    "cell-flagged"
+                                ).textContent =
+                                    " " + cellFlagged + "/" + mineCount;
+                                window.getElementById(
+                                    "cell-suspected"
+                                ).textContent = " " + cellSuspect;
+                            } else return;
+                        }
+                    };
+                })(i, j);
+            }
             if (board[i][j].revealed) {
                 if (board[i][j].mine) {
                     if (board[i][j].flagged) {
-                        cell.className = "cell true-flag fa-solid fa-check fa-xl";
+                        cell.className =
+                            "cell true-flag fa-solid fa-check fa-xl";
                     } else {
                         cell.className = "cell mine fa-solid fa-bomb";
                     }
@@ -384,7 +390,7 @@ function scoreCalculator(timeTaken, win) {
         timeBonus = Math.max(0, (standardTime - timeTaken) / standardTime);
         mineFlagged = mineCount;
     }
-    let baseScore = (cellRevealed * 2 + mineFlagged * 5);
+    let baseScore = cellRevealed * 2 + mineFlagged * 5;
     let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
     let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
     if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
@@ -407,8 +413,8 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
-            checkHallOfFame(score, timeTaken, "W");
-            if (score > highScore) {
+            if (score > highScore && !botPlaying) {
+                checkHallOfFame(score, timeTaken, "W");
                 highScore = score;
                 let highScoreDiv = document.getElementById("highScore");
                 highScoreDiv.textContent = "Best: " + highScore;
@@ -448,8 +454,8 @@ function checkLoss() {
                     clearInterval(intervalId);
                 }, 100);
                 alert("You lost! Score: " + score);
-                checkHallOfFame(score, timeTaken, "L");
-                if (score > highScore) {
+                if (score > highScore && !botPlaying) {
+                    checkHallOfFame(score, timeTaken, "L");
                     highScore = score;
                     let highScoreDiv = document.getElementById("highScore");
 
