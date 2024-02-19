@@ -19,10 +19,10 @@ function playBot() {
     while (openedCells.length != 0) {
         openedCells.pop();
     }
-    var x = 1;
-    //  Math.round(Math.random() * board.length);
-    var y = 1;
-    // Math.round(Math.random() * board[0].length);
+    var x =
+      Math.round(Math.random() * board.length);
+    var y = 
+     Math.round(Math.random() * board[0].length);
     if (!startTime) {
         startTime = new Date();
         placeMines(x, y);
