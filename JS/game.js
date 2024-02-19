@@ -134,6 +134,7 @@ function resetGame() {
     createBoard();
     calculateNumbers();
     drawBoard();
+    console.clear();
 }
 
 function createBoard() {
@@ -275,10 +276,10 @@ function drawBoard() {
                                 --cellSuspect;
                             }
                             drawBoard();
-                            document.getElementById(
+                            window.getElementById(
                                 "cell-flagged"
                             ).textContent = " " + cellFlagged + "/" + mineCount;
-                            document.getElementById(
+                            window.getElementById(
                                 "cell-suspected"
                             ).textContent = " " + cellSuspect;
                         } else return;
@@ -386,7 +387,6 @@ function scoreCalculator(timeTaken, win) {
     let baseScore = (cellRevealed * 2 + mineFlagged * 5);
     let difficultyScore = baseScore * calculateDifficulty(size, mineCount);
     let totalScore = Math.round(difficultyScore + timeBonus * difficultyScore);
-    console.log("timeBonus: " + timeBonus);
     if (!win) totalScore = totalScore - Math.round(timeBonus * difficultyScore);
     return totalScore;
 }
@@ -420,6 +420,19 @@ function checkWin() {
     return win;
 }
 
+function checkWinWithoutAlert() {
+    let win = true;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (!board[i][j].mine && !board[i][j].revealed) {
+                win = false;
+                break;
+            }
+        }
+    }
+    return win;
+}
+
 function checkLoss() {
     loss = false;
     for (let i = 0; i < size; ++i) {
@@ -445,6 +458,20 @@ function checkLoss() {
                 }
                 loss = true;
 
+                break;
+            }
+        }
+        if (loss) break;
+    }
+    return loss;
+}
+
+function checkLossWithoutAlert() {
+    loss = false;
+    for (let i = 0; i < size; ++i) {
+        for (let j = 0; j < size; ++j) {
+            if (board[i][j].mine && board[i][j].revealed) {
+                loss = true;
                 break;
             }
         }
