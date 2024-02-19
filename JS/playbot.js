@@ -33,10 +33,10 @@ function playBot() {
     drawBoard();
     checkWin();
 
-    // intervalId = setInterval(function () {
-    function spaceKeyDown(e) {
-        if (e.code === "Space") {
-            e.preventDefault();
+    intervalId = setInterval(function () {
+        // function spaceKeyDown(e) {
+        // if (e.code === "Space") {
+            // e.preventDefault();
             //Set the default probability values
             for (var i = 0; i < board.length; ++i) {
                 // if (probability[i] === undefined) {
@@ -65,14 +65,14 @@ function playBot() {
             makeDecision();
             if (checkWin() || checkLossWithoutAlert()) {
                 clearInterval(intervalId);
-                window.removeEventListener("keydown", spaceKeyDown);
+                // window.removeEventListener("keydown", spaceKeyDown);
                 return;
             }
-        }
-        // }, 1000);
-    }
+        // }
+    }, 300);
+    // }
 
-    window.addEventListener("keydown", spaceKeyDown);
+    // window.addEventListener("keydown", spaceKeyDown);
 }
 
 function countSurrounded(posX, posY) {
