@@ -12,16 +12,18 @@ var dX = [-1, 0, 1, -1, 1, -1, 0, 1];
 var dY = [-1, -1, -1, 0, 0, 1, 1, 1];
 
 function playBot() {
-    resetGame();
     sliderValue = document.getElementById("myRange").value;
 
     if (checkLossWithoutAlert() || startTime) {
+        playbotDiv.style.pointerEvents = "none";
+        playbotDiv.style.opacity = "0.6";
         alert("Please restart the game before let the bot play.");
         return;
     }
     while (openedCells.length != 0) {
         openedCells.pop();
     }
+    resetGame();
     var x = Math.round(Math.random() * board.length);
     var y = Math.round(Math.random() * board[0].length);
     if (!startTime) {
@@ -30,8 +32,7 @@ function playBot() {
         calculateNumbers();
         startTimer();
         botPlaying = true;
-        playbotDiv.style.pointerEvents = "none";
-        playbotDiv.style.opacity = "0.6";
+        
     }
     revealCell(x, y);
     drawBoard();
