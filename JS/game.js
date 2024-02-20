@@ -1,6 +1,8 @@
 let board = [];
 let size = parseInt(document.getElementById("size").value);
 let mineCount = parseInt(document.getElementById("mine").value);
+let playbotDiv = document.getElementById("playbot");
+
 let startTime;
 let timerInterval;
 let intervalId;
@@ -22,23 +24,27 @@ const delay = 200; // Time interval in milliseconds
 
 function displayValue(value) {
     var sliderValue = document.getElementById("sliderValue");
-    sliderValue.style.display = 'block';
-    sliderValue.innerHTML = value / 1000 + 's';
+    sliderValue.style.display = "block";
+    sliderValue.innerHTML = value / 1000 + "s";
     var slider = document.getElementById("myRange");
     var rect = slider.getBoundingClientRect();
     var sliderValueRect = sliderValue.getBoundingClientRect();
-    sliderValue.style.left = rect.left + (slider.value - slider.min) / (slider.max - slider.min) * rect.width - sliderValueRect.width / 2 + 'px';
-    sliderValue.style.top = rect.top - sliderValue.offsetHeight + 'px';
+    sliderValue.style.left =
+        rect.left +
+        ((slider.value - slider.min) / (slider.max - slider.min)) * rect.width -
+        sliderValueRect.width / 2 +
+        "px";
+    sliderValue.style.top = rect.top - sliderValue.offsetHeight + "px";
 }
 
 function showValue() {
     var sliderValue = document.getElementById("sliderValue");
-    sliderValue.style.display = 'block';
+    sliderValue.style.display = "block";
 }
 
 function hideValue() {
     var sliderValue = document.getElementById("sliderValue");
-    sliderValue.style.display = 'none';
+    sliderValue.style.display = "none";
 }
 
 document.addEventListener(
@@ -152,6 +158,8 @@ function resetGame() {
     cellFlagged = 0;
     cellSuspect = 0;
     botPlaying = false;
+    playbotDiv.style.pointerEvents = "all";
+    playbotDiv.style.opacity = "1";
     document.getElementById("cell-flagged").textContent =
         " " + cellFlagged + "/" + mineCount;
     document.getElementById("cell-suspected").textContent = " " + cellSuspect;
@@ -540,5 +548,3 @@ function checkHallOfFame(score, timeTaken, win) {
 window.onload = function () {
     resetGame();
 };
-
-

@@ -10,7 +10,6 @@ while (openedCells.length != 0) {
 var probability = [[]];
 var dX = [-1, 0, 1, -1, 1, -1, 0, 1];
 var dY = [-1, -1, -1, 0, 0, 1, 1, 1];
-var playbotDiv = document.getElementById("playbot");
 
 function playBot() {
     resetGame();
