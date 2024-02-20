@@ -48,14 +48,14 @@ body {
 }
 
 .suspect.fa-question {
-    color: #FD8438;
+    color: #fd8438;
 }
 .true-flag {
     background: pink;
 }
 
 .true-flag.fa-check {
-    color: #003F34;
+    color: #003f34;
 }
 
 .cell {
@@ -129,6 +129,65 @@ body {
     color: burlywood;
 }
 
+.slidecontainer {
+    width: 100%;
+    align-items: center;
+    display: flex;
+}
+
+strong {
+    padding-top: 10px;
+    padding-bottom: -20px;
+    display: flex;
+}
+
+.slider {
+    margin: 0 15px 0 15px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80%;
+    height: 10px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+}
+
+#sliderValue {
+    background-color: black;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 5px;
+    display: none;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04aa6d;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    border-radius: 50%;
+    background: #04aa6d; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.slider-set-button {
+    padding: 10px;
+}
 #value-reset {
     background-color: #1d4c5e;
     color: #f5f5dc; /* Beige */
@@ -141,7 +200,8 @@ body {
     border: 1px solid #1d4c5e;
 }
 
-.difficulty input {
+.difficulty #mine,
+.difficulty #size {
     border: none;
     border-radius: 6px;
     box-shadow: 1px 1px 2px #eee;
@@ -172,12 +232,7 @@ body {
 #notification {
     display: none;
     min-width: 250px; /* Set a default minimum width */
-    background-color: rgba(
-        42,
-        223,
-        81,
-        0.8
-    ); /* Black background color */
+    background-color: rgba(42, 223, 81, 0.8); /* Black background color */
     color: #fff; /* White text color */
     text-align: center; /* Centered text */
     border-radius: 6px; /* Rounded borders */

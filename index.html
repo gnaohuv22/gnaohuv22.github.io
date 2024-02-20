@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Minesweeper v0.12 by gnaohuv</title>
+        <title>Minesweeper v0.12.1 by gnaohuv</title>
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -10,7 +10,7 @@
             referrerpolicy="no-referrer"
         />
 
-        <link rel="stylesheet" href="CSS/index.css"/>
+        <link rel="stylesheet" href="CSS/index.css" />
     </head>
     <body>
         <div class="hall-of-fame">
@@ -27,7 +27,7 @@
                     Reset Highscore
                 </div>
                 <div id="playbot" onclick="playBot()">
-                    Bot play v0.2.2 (experimental)
+                    Bot play v0.3 (experimental)
                 </div>
             </div>
             <div class="difficulty">
@@ -45,6 +45,25 @@
                     style="color: #74c0fc"
                 ></i>
                 <span id="cell-suspected"></span> <br />
+                <strong id="bot-slider-desc">Bot Move Delay (minimum)</strong
+                ><br />
+                <div class="slidecontainer">
+                    Faster
+                    <input
+                        type="range"
+                        min="100"
+                        max="5000"
+                        value="1000"
+                        class="slider"
+                        id="myRange"
+                        oninput="displayValue(this.value)"
+                        onmousedown="showValue()"
+                        onmouseup="hideValue()"
+                    />
+                    Slower
+                    <div id="sliderValue" style="position: absolute"></div>
+                    <!-- Add this line -->
+                </div>
                 <div id="errMsg"></div>
             </div>
         </div>
@@ -66,8 +85,10 @@
         <script src="JS/playbot.js"></script>
         <script>
             var playbotDiv = document.getElementById("playbot");
-            // playbotDiv.style.pointerEvents = "none";
-            // playbotDiv.style.opacity = "0.6";
+            if (botPlaying) {
+                playbotDiv.style.pointerEvents = "none";
+                playbotDiv.style.opacity = "0.6";
+            }
         </script>
     </body>
 </html>
