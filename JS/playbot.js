@@ -232,7 +232,8 @@ function makeDecision() {
                     getUnopenedCellsAround(b.x, b.y).length
                 );
             });
-            revealCell(minProbCells[0].x, minProbCells[0].y);
+            let index = Math.round(Math.random() * (minProbCells.length - 1));
+            revealCell(minProbCells[index].x, minProbCells[index].y);
         }
 
         drawBoard();
@@ -363,7 +364,8 @@ function makeAdvancedDecision() {
                 getUnopenedCellsAround(b.x, b.y).length
             );
         });
-        revealCell(minProbCells[0].x, minProbCells[0].y);
+        let index = Math.round(Math.random() * (minProbCells.length - 1));
+        revealCell(minProbCells[index].x, minProbCells[index].y);
     }
 
     drawBoard();
