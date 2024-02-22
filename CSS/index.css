@@ -10,15 +10,16 @@ body {
 .board {
     display: flex;
     justify-content: center;
-    height: 100vh;
+    height: max-content;
     margin-top: 7vh;
-    margin-bottom: 20vh;
+    margin-bottom: 10vh;
     flex-wrap: nowrap;
     text-wrap: nowrap;
     overflow: visible;
 }
 .mine {
     background: rgb(184, 44, 44);
+    transition: fade;
     align-items: center;
     justify-content: center;
 }
@@ -70,6 +71,7 @@ body {
     line-height: 40px;
     font-weight: bold;
     box-sizing: border-box;
+    transition: background .3s ease-in-out;
 }
 .control {
     position: relative;
@@ -151,16 +153,18 @@ strong {
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;
-    -webkit-transition: 0.2s;
-    transition: opacity 0.2s;
+    -webkit-transition: 0.5s;
+    transition: opacity 0.5s;
 }
 
 #sliderValue {
     background-color: black;
+    opacity: 0.6;
     color: white;
     border-radius: 4px;
-    padding: 2px 5px;
+    padding: 6px 15px;
     display: none;
+    backdrop-filter: contrast(2px);
 }
 
 .slider:hover {

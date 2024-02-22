@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Minesweeper v0.12.1 by gnaohuv</title>
+        <title>Minesweeper v0.13 by gnaohuv</title>
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -27,7 +27,7 @@
                     Reset Highscore
                 </div>
                 <div id="playbot" onclick="playBot()">
-                    Bot play v0.3 (experimental)
+                    Bot play v0.3.1 (experimental)
                 </div>
             </div>
             <div class="difficulty">
@@ -48,7 +48,7 @@
                 <strong id="bot-slider-desc">Bot Move Delay (minimum)</strong
                 ><br />
                 <div class="slidecontainer">
-                    Faster
+                    <i class="fa-solid fa-rocket"></i>
                     <input
                         type="range"
                         min="100"
@@ -57,10 +57,11 @@
                         class="slider"
                         id="myRange"
                         oninput="displayValue(this.value)"
-                        onmousedown="showValue()"
-                        onmouseup="hideValue()"
+                        onmousedown="showValue();"
+                        onmouseup="hideValue(); "
+                        step="100"
                     />
-                    Slower
+                    <i class="fa-solid fa-otter"></i>
                     <div id="sliderValue" style="position: absolute"></div>
                     <!-- Add this line -->
                 </div>

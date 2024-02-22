@@ -20,7 +20,7 @@ let highScoreDiv = document.getElementById("highScore");
 highScoreDiv.textContent = "Best: " + highScore;
 
 let lastClickTime = 0;
-const delay = 200; // Time interval in milliseconds
+const delay = 100; // Time interval in milliseconds
 
 function displayValue(value) {
     var sliderValue = document.getElementById("sliderValue");
@@ -122,6 +122,8 @@ function resetValue() {
         document.getElementById("mine").value = 18;
         size = 10;
         mineCount = 18;
+        playbotDiv.style.pointerEvents = "all";
+        playbotDiv.style.opacity = "1";
         resetGame();
     } else {
         alert("Cannot reset value while a game is in progress.");
@@ -229,6 +231,8 @@ function calculateNumbers() {
 
 function startTimer() {
     isPlaying = true;
+    playbotDiv.style.pointerEvents = "none";
+    playbotDiv.style.opacity = "0.6";
     timerInterval = setInterval(function () {
         let now = new Date();
         let timeElapsed = Math.floor((now - startTime) / 1000);
@@ -309,11 +313,11 @@ function drawBoard() {
                                     --cellSuspect;
                                 }
                                 drawBoard();
-                                window.getElementById(
+                                document.getElementById(
                                     "cell-flagged"
                                 ).textContent =
                                     " " + cellFlagged + "/" + mineCount;
-                                window.getElementById(
+                                document.getElementById(
                                     "cell-suspected"
                                 ).textContent = " " + cellSuspect;
                             } else return;
@@ -330,15 +334,25 @@ function drawBoard() {
                         cell.className = "cell mine fa-solid fa-bomb";
                     }
                 } else if (board[i][j].number > 0) {
-                    cell.className = "cell number";
+                    cell.classList.remove("hidden");
+                    cell.classList.add("number");
                     cell.textContent = board[i][j].number;
                 } else {
-                    cell.className = "cell empty";
+                    cell.classList.remove("hidden");
+                    cell.classList.add("empty");
                 }
             } else if (board[i][j].flagged) {
-                cell.className = "cell flagged fa-solid fa-flag fa-lg";
+                cell.classList.remove("hidden");
+                cell.classList.add("flagged");
+                cell.classList.add("fa-solid");
+                cell.classList.add("fa-flag");
+                cell.classList.add("fa-lg");
             } else if (board[i][j].suspect) {
-                cell.className = "cell suspect fa-solid fa-question fa-lg";
+                cell.classList.remove("hidden");
+                cell.classList.add("suspect");
+                cell.classList.add("fa-solid");
+                cell.classList.add("fa-question");
+                cell.classList.add("fa-lg");
             }
             boardDiv.appendChild(cell);
         }

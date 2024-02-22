@@ -15,8 +15,6 @@ function playBot() {
     sliderValue = document.getElementById("myRange").value;
 
     if (checkLossWithoutAlert() || startTime) {
-        playbotDiv.style.pointerEvents = "none";
-        playbotDiv.style.opacity = "0.6";
         alert("Please restart the game before let the bot play.");
         return;
     }
@@ -24,8 +22,8 @@ function playBot() {
         openedCells.pop();
     }
     resetGame();
-    var x = Math.round(Math.random() * board.length);
-    var y = Math.round(Math.random() * board[0].length);
+    var x = Math.round(Math.random() * (board.length - 1));
+    var y = Math.round(Math.random() * (board[0].length - 1));
     if (!startTime) {
         startTime = new Date();
         placeMines(x, y);
@@ -175,6 +173,11 @@ function makeDecision() {
                 var y = j;
                 if (probability[x][y] === 1.0) {
                     board[x][y].flagged = true;
+                    ++cellFlagged;
+                    document.getElementById(
+                        "cell-flagged"
+                    ).textContent =
+                        " " + cellFlagged + "/" + mineCount;
                     drawBoard();
                 }
             }
