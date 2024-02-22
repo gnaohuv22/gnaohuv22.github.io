@@ -11,9 +11,7 @@ function convertTime(time) {
 for (var i = 1; i <= 10; ++i) {
     let score = localStorage.getItem("hofScore" + i);
     let timeTaken = localStorage.getItem("hofTime" + i);
-    timeTaken = convertTime(timeTaken);
     let state = localStorage.getItem("hofState" + i);
-
     let hofTable = document.getElementById("hof");
     let row = document.createElement("tr");
 
@@ -23,6 +21,10 @@ for (var i = 1; i <= 10; ++i) {
     let playerScore = document.createElement("td");
     playerScore.textContent = score;
 
+    let scorePerMin = document.createElement("td");
+    scorePerMin.textContent = ((score / timeTaken) * 60.0).toFixed(1);
+
+    timeTaken = convertTime(timeTaken);
     let playerTime = document.createElement("td");
     playerTime.textContent = timeTaken;
 
@@ -35,6 +37,7 @@ for (var i = 1; i <= 10; ++i) {
             position.textContent = i + 'st';
             playerScore.className = "first-place";
             playerTime.className = "first-place";
+            scorePerMin.className = "first-place";
             playerState.className = "first-place";
             break;
         case 2:
@@ -42,6 +45,7 @@ for (var i = 1; i <= 10; ++i) {
             position.textContent = i + 'nd';
             playerScore.className = "second-place";
             playerTime.className = "second-place";
+            scorePerMin.className = "second-place";
             playerState.className = "second-place";
             break;
         case 3:
@@ -49,6 +53,7 @@ for (var i = 1; i <= 10; ++i) {
             position.textContent = i + 'rd';
             playerScore.className = "third-place";
             playerTime.className = "third-place";
+            scorePerMin.className = "third-place";
             playerState.className = "third-place";
             break;
         default:
@@ -56,12 +61,14 @@ for (var i = 1; i <= 10; ++i) {
             position.textContent = i + 'th';
             playerScore.className = "other";
             playerTime.className = "other";
+            scorePerMin.className = "other";
             playerState.className = "other";
     }
 
     row.appendChild(position);
     row.appendChild(playerScore);
     row.appendChild(playerTime);
+    row.appendChild(scorePerMin);
     row.appendChild(playerState);
     hofTable.appendChild(row);
 }

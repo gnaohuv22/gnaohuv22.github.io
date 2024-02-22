@@ -312,6 +312,7 @@ function drawBoard() {
                                     board[i][j].suspect = false;
                                     --cellSuspect;
                                 }
+
                                 drawBoard();
                                 document.getElementById(
                                     "cell-flagged"
@@ -457,12 +458,14 @@ function checkWin() {
         let score = scoreCalculator(timeTaken, win);
         setTimeout(function () {
             alert("Congratulation for the winner! Score: " + score);
-            if (score > highScore && !botPlaying) {
+            if (!botPlaying) {
                 checkHallOfFame(score, timeTaken, "W");
-                highScore = score;
-                let highScoreDiv = document.getElementById("highScore");
-                highScoreDiv.textContent = "Best: " + highScore;
-                localStorage.setItem("highScore", highScore);
+                if (score > highScore) {
+                    highScore = score;
+                    let highScoreDiv = document.getElementById("highScore");
+                    highScoreDiv.textContent = "Best: " + highScore;
+                    localStorage.setItem("highScore", highScore);
+                }
             }
             resetGame();
         }, 100);
@@ -498,15 +501,17 @@ function checkLoss() {
                     clearInterval(intervalId);
                 }, 100);
                 alert("You lost! Score: " + score);
-                if (score > highScore && !botPlaying) {
+                if (!botPlaying) {
                     checkHallOfFame(score, timeTaken, "L");
-                    highScore = score;
-                    let highScoreDiv = document.getElementById("highScore");
+                    if (score > highScore && !botPlaying) {
+                        highScore = score;
+                        let highScoreDiv = document.getElementById("highScore");
 
-                    highScoreDiv.textContent = "Best: " + highScore;
-                    localStorage.setItem("highScore", highScore);
+                        highScoreDiv.textContent = "Best: " + highScore;
+                        localStorage.setItem("highScore", highScore);
+                    }
+                    loss = true;
                 }
-                loss = true;
 
                 break;
             }
