@@ -8,6 +8,10 @@ function convertTime(time) {
     return minutes + "m" + seconds + "s";
 }
 
+function goBack() {
+    window.history.back();
+}
+
 for (var i = 1; i <= 10; ++i) {
     let score = localStorage.getItem("hofScore" + i);
     let timeTaken = localStorage.getItem("hofTime" + i);

@@ -1,6 +1,10 @@
 let board = [];
+document.getElementById("size").value = localStorage.getItem("size") || 10;
+document.getElementById("mine").value = localStorage.getItem("mine") || 18;
+
 let size = parseInt(document.getElementById("size").value);
 let mineCount = parseInt(document.getElementById("mine").value);
+
 let playbotDiv = document.getElementById("playbot");
 
 let startTime;
@@ -14,6 +18,7 @@ let botPlaying = false;
 var sliderValue = document.getElementById("myRange").value;
 
 let loss;
+let win;
 
 let highScore = localStorage.getItem("highScore") || 0;
 let highScoreDiv = document.getElementById("highScore");
@@ -34,7 +39,7 @@ function displayValue(value) {
         ((slider.value - slider.min) / (slider.max - slider.min)) * rect.width -
         sliderValueRect.width / 2 +
         "px";
-    sliderValue.style.top = rect.top - sliderValue.offsetHeight + "px";
+    // sliderValue.style.top = rect.top - sliderValue.offsetHeight + "px";
 }
 
 function showValue() {
@@ -97,17 +102,18 @@ document.getElementById("mine").addEventListener("input", function (e) {
 });
 
 function setValue() {
-    if (!isPlaying || loss) {
+    if (!isPlaying || loss || win) {
         // let prevSize = size;
         // let prevMineCount = mineCount;
         size = parseInt(document.getElementById("size").value);
         mineCount = parseInt(document.getElementById("mine").value);
 
         if (size < 5)
-            showMsg(
-                "Please set size to 5 or greater to setup table.");
+            showMsg("Please set size to 5 or greater to setup table.");
         else {
             showMsg("Value changed!");
+            localStorage.setItem("size", size);
+            localStorage.setItem("mine", mineCount);
             resetGame();
         }
     } else {
@@ -117,9 +123,11 @@ function setValue() {
 }
 
 function resetValue() {
-    if (!isPlaying || loss) {
+    if (!isPlaying || loss || win) {
         document.getElementById("size").value = 10;
         document.getElementById("mine").value = 18;
+        localStorage.setItem("size", 10);
+        localStorage.setItem("mine", 18);
         size = 10;
         mineCount = 18;
         playbotDiv.style.pointerEvents = "all";
@@ -155,6 +163,7 @@ function resetGame() {
         '<i class="fa-solid fa-stopwatch"></i>' + " 00:00";
     isPlaying = false;
     loss = false;
+    win = false;
     board = [];
     startTime = null;
     cellFlagged = 0;
@@ -169,24 +178,6 @@ function resetGame() {
     calculateNumbers();
     drawBoard();
     console.clear();
-}
-
-function createBoard() {
-    for (let i = 0; i < size; i++) {
-        board[i] = [];
-        for (let j = 0; j < size; j++) {
-            board[i][j] = {
-                mine: false,
-                number: 0,
-                revealed: false,
-                flagged: false,
-                suspect: false,
-                x: i,
-                y: j,
-                id: i + "-" + j,
-            };
-        }
-    }
 }
 
 function placeMines(exceptX, exceptY) {
@@ -229,160 +220,8 @@ function calculateNumbers() {
     }
 }
 
-function startTimer() {
-    isPlaying = true;
-    playbotDiv.style.pointerEvents = "none";
-    playbotDiv.style.opacity = "0.6";
-    timerInterval = setInterval(function () {
-        let now = new Date();
-        let timeElapsed = Math.floor((now - startTime) / 1000);
-        let minutes = Math.floor(timeElapsed / 60);
-        let seconds = timeElapsed % 60;
-        document.getElementById("timer").innerHTML =
-            '<i class="fa-solid fa-stopwatch"></i>' +
-            " " +
-            pad(minutes) +
-            ":" +
-            pad(seconds);
-    }, 1000);
-}
-
 function pad(number) {
     return number < 10 ? "0" + number : number;
-}
-
-function drawBoard() {
-    let boardDiv = document.getElementById("board");
-    boardDiv.innerHTML = "";
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            let cell = document.createElement("div");
-            cell.className = "cell hidden";
-            if (!botPlaying) {
-                cell.onclick = (function (i, j) {
-                    return function () {
-                        if (!startTime) {
-                            startTime = new Date();
-                            placeMines(i, j);
-                            calculateNumbers();
-                            startTimer();
-                        }
-                        // if (board[i][j].flagged) {
-                        //     board[i][j].flagged = !board[i][j].flagged;
-                        // }
-
-                        if (!loss) {
-                            revealCell(i, j);
-                            drawBoard();
-                            checkWin();
-                        } else return;
-                    };
-                })(i, j);
-                cell.oncontextmenu = (function (i, j) {
-                    return function (e) {
-                        e.preventDefault();
-                        if (!startTime) {
-                            startTime = new Date();
-                            placeMines(i, j);
-                            calculateNumbers();
-                            startTimer();
-                        } else {
-                            if (!loss) {
-                                if (
-                                    !board[i][j].flagged &&
-                                    !board[i][j].suspect &&
-                                    !board[i][j].revealed
-                                ) {
-                                    board[i][j].flagged = true;
-                                    ++cellFlagged;
-                                } else if (
-                                    board[i][j].flagged &&
-                                    !board[i][j].suspect &&
-                                    !board[i][j].revealed
-                                ) {
-                                    board[i][j].suspect = true;
-                                    board[i][j].flagged = false;
-                                    --cellFlagged;
-                                    ++cellSuspect;
-                                } else if (
-                                    !board[i][j].flagged &&
-                                    board[i][j].suspect &&
-                                    !board[i][j].revealed
-                                ) {
-                                    board[i][j].suspect = false;
-                                    --cellSuspect;
-                                }
-
-                                drawBoard();
-                                document.getElementById(
-                                    "cell-flagged"
-                                ).textContent =
-                                    " " + cellFlagged + "/" + mineCount;
-                                document.getElementById(
-                                    "cell-suspected"
-                                ).textContent = " " + cellSuspect;
-                            } else return;
-                        }
-                    };
-                })(i, j);
-            }
-            if (board[i][j].revealed) {
-                if (board[i][j].mine) {
-                    if (board[i][j].flagged) {
-                        cell.className =
-                            "cell true-flag fa-solid fa-check fa-xl";
-                    } else {
-                        cell.className = "cell mine fa-solid fa-bomb";
-                    }
-                } else if (board[i][j].number > 0) {
-                    cell.classList.remove("hidden");
-                    cell.classList.add("number");
-                    cell.textContent = board[i][j].number;
-                } else {
-                    cell.classList.remove("hidden");
-                    cell.classList.add("empty");
-                }
-            } else if (board[i][j].flagged) {
-                cell.classList.remove("hidden");
-                cell.classList.add("flagged");
-                cell.classList.add("fa-solid");
-                cell.classList.add("fa-flag");
-                cell.classList.add("fa-lg");
-            } else if (board[i][j].suspect) {
-                cell.classList.remove("hidden");
-                cell.classList.add("suspect");
-                cell.classList.add("fa-solid");
-                cell.classList.add("fa-question");
-                cell.classList.add("fa-lg");
-            }
-            boardDiv.appendChild(cell);
-        }
-        boardDiv.appendChild(document.createElement("br"));
-    }
-}
-
-function revealCell(x, y) {
-    if (
-        x >= 0 &&
-        x < size &&
-        y >= 0 &&
-        y < size &&
-        !board[x][y].revealed &&
-        !board[x][y].flagged
-    ) {
-        board[x][y].revealed = true;
-        if (board[x][y].mine) {
-            checkLoss();
-            return;
-        }
-        if (board[x][y].number == 0) {
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    revealCell(x + dx, y + dy);
-                }
-            }
-        }
-    }
 }
 
 function checkFlagged() {
@@ -405,14 +244,6 @@ function checkRevealed() {
         }
     }
     return revealCount;
-}
-
-function revealMines() {
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (board[i][j].mine) board[i][j].revealed = true;
-        }
-    }
 }
 
 function calculateDifficulty(size, mineCount) {
@@ -443,7 +274,7 @@ function scoreCalculator(timeTaken, win) {
 }
 
 function checkWin() {
-    let win = true;
+    win = true;
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (!board[i][j].mine && !board[i][j].revealed) {

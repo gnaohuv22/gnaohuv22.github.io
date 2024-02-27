@@ -35,23 +35,24 @@
             </div>
             <div class="difficulty">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                <input type="number" id="size" max="75" value="10" />
+                <input type="number" id="size" max="75" title="Size of board" />
 
                 <i class="fa-solid fa-bomb"></i>
-                <input type="number" id="mine" value="18" />
+                <input type="number" id="mine" title="Number of mines" />
                 <button id="submit" onclick="setValue()">Set</button>
                 <button id="value-reset" onclick="resetValue()">Reset</button>
-                <i class="flag fa-solid fa-flag" style="color: #ff0000"></i>
+                <i class="flag fa-solid fa-flag" style="color: #ff0000" title="Flagged cells"></i>
                 <span id="cell-flagged"></span>
                 <i
                     class="question-mark fa-solid fa-question"
                     style="color: #74c0fc"
+                    title="Suspect cells"
                 ></i>
                 <span id="cell-suspected"></span> <br />
                 <strong id="bot-slider-desc">Bot Move Delay (minimum)</strong
                 ><br />
                 <div class="slidecontainer">
-                    <i class="fa-solid fa-rocket"></i>
+                    <i class="fa-solid fa-rocket" title="Faster"></i>
                     <input
                         type="range"
                         min="100"
@@ -64,7 +65,7 @@
                         onmouseup="hideValue(); "
                         step="100"
                     />
-                    <i class="fa-solid fa-otter"></i>
+                    <i class="fa-solid fa-otter" title="Slower"></i>
                     <div id="sliderValue" style="position: absolute"></div>
                     <!-- Add this line -->
                 </div>
@@ -79,6 +80,7 @@
 
         </div>
         <script src="js/notification.js"></script>
+        <script src="js/game.js"></script>
         <script src="js/classic.js"></script>
         <script src="js/playbot.js"></script>
     </body>
