@@ -47,9 +47,9 @@
 }
 /* Main styles */
 body {
-  margin-top: 3.5rem;
-  color: #000000;
-  font: 700 16px/1.5 exo, ubuntu, "segoe ui", helvetica, arial, sans-serif;
+  margin-top: 8.5rem;
+  color: #797878;
+  font: 400 16px/1.5 exo, ubuntu, "segoe ui", helvetica, arial, sans-serif;
   text-align: center;
   /* img size is 50x50 */
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC") repeat 0 0;
@@ -70,58 +70,39 @@ body {
     -moz-user-select: none; /* Firefox syntax */
     -ms-user-select: none; /* IE syntax */
 }
+body::before {
+  content: "Game mode";
+  font-size: 8rem;
+  font-weight: 500;
+  font-style: normal;
+}
 
-table {
-    position: relative;
-    height: 80vh;
-    margin-top: 7vh;
-    margin-bottom: 10vh;
-    text-wrap: nowrap;
-    overflow: hidden;
-    width: 40vw;
+.mode {
+    display: flex;
+    flex-direction: column;
     text-align: center;
-    left: 30vw;
-    border: none;
+    align-items: center;
+    align-content: center;
 }
 
-.other {
-    color: #e0ecde;
-    background: gray;
+.mode a {
+    background: rgb(255, 255, 255, 0.8);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #797878;
+    font-size: 28px;
+    font-weight: 700;
+    border: 1px solid #797878;
+    border-radius: 12px;
+    width: 400px;
+    height: 100px;
+    margin: 20px;
+    padding: 10px;
 }
 
-.table-title {
-    background: darkgray;
-    color: #e0ecde;
-    font-weight: bold;
-    font-size: large;
-}
-td {
-    border-radius: 6px;
-}
-
-.first-place {
-    background: gold;
-    color: black;
-    font-size: x-large;
-    font-weight: bolder;
-}
-
-.second-place {
-    background: silver;
-    color: black;
-    font-size: larger;
-    font-weight: bold;
-}
-
-.third-place {
-    background: #cd7f32;
-    font-size: large;
-}
-
-.back a {
-    color: #3a3737;
-}
-
-.back a:hover {
-    color: #000000;
+.mode a:hover {
+    opacity: 0.5;
 }

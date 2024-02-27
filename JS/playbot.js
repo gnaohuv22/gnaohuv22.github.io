@@ -15,7 +15,7 @@ function playBot() {
     sliderValue = document.getElementById("myRange").value;
 
     if (checkLossWithoutAlert() || startTime) {
-        alert("Please restart the game before let the bot play.");
+        showMsg("Please restart the game before let the bot play.");
         return;
     }
     while (openedCells.length != 0) {
@@ -32,6 +32,7 @@ function playBot() {
         botPlaying = true;
         
     }
+    if (!checkLossWithoutAlert())
     revealCell(x, y);
     drawBoard();
     checkWin();
@@ -137,7 +138,7 @@ function makeDecision() {
                     x < board.length &&
                     y < board[0].length
                 ) {
-                    if (!board[x][y].revealed && !board[x][y].flagged) {
+                    if (!board[x][y].revealed && !board[x][y].flagged && !checkLossWithoutAlert()) {
                         revealCell(x, y);
                         drawBoard();
                         opened = true;
@@ -226,7 +227,7 @@ function makeDecision() {
             ) {
                 pos.x = Math.round(Math.random() * (board.length - 1));
                 pos.y = Math.round(Math.random() * (board[0].length - 1));
-                revealCell(pos.x, pos.y);
+                if (!checkLossWithoutAlert()) revealCell(pos.x, pos.y);
             }
         } else {
             minProbCells.sort(function (a, b) {
@@ -236,7 +237,7 @@ function makeDecision() {
                 );
             });
             let index = Math.round(Math.random() * (minProbCells.length - 1));
-            revealCell(minProbCells[index].x, minProbCells[index].y);
+            if (!checkLossWithoutAlert()) revealCell(minProbCells[index].x, minProbCells[index].y);
         }
 
         drawBoard();
@@ -358,7 +359,7 @@ function makeAdvancedDecision() {
         while (board[pos.x][pos.y].revealed || board[pos.x][pos.y].flagged) {
             pos.x = Math.round(Math.random() * (board.length - 1));
             pos.y = Math.round(Math.random() * (board[0].length - 1));
-            revealCell(pos.x, pos.y);
+            if (!checkLossWithoutAlert()) revealCell(pos.x, pos.y);
         }
     } else {
         minProbCells.sort(function (a, b) {
@@ -368,7 +369,7 @@ function makeAdvancedDecision() {
             );
         });
         let index = Math.round(Math.random() * (minProbCells.length - 1));
-        revealCell(minProbCells[index].x, minProbCells[index].y);
+        if (!checkLossWithoutAlert()) revealCell(minProbCells[index].x, minProbCells[index].y);
     }
 
     drawBoard();

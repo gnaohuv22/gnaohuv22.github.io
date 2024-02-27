@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Minesweeper v0.13 by gnaohuv</title>
+        <title>Minesweeper: Menu</title>
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -10,79 +10,20 @@
             referrerpolicy="no-referrer"
         />
 
-        <link rel="stylesheet" href="CSS/index.css" />
+        <link rel="stylesheet" href="css/index.css" />
     </head>
     <body>
-        <div class="hall-of-fame">
-            <a href="halloffame.html">Go to Hall of Fame</a>
-        </div>
-        <div class="control">
-            <div class="timer">
-                <div id="timer">
-                    <i class="fa-solid fa-stopwatch"></i>
-                </div>
-                <div id="highScore"></div>
-                <div id="reset" onclick="resetGame()">Reset Game</div>
-                <div id="reset-high-score" onclick="resetHighScore()">
-                    Reset Highscore
-                </div>
-                <div id="playbot" onclick="playBot()">
-                    Bot play v0.3.1 (experimental)
-                </div>
+        <div class="bg"></div>
+        <div class="button-list">
+            <div class="first-line">
+                <a class="button mode" href="mode.html">Game mode</a>
+                <a class="button hof" href="halloffame.html">Hall of Fame</a>
             </div>
-            <div class="difficulty">
-                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                <input type="number" id="size" max="75" value="10" />
-
-                <i class="fa-solid fa-bomb"></i>
-                <input type="number" id="mine" value="18" />
-                <button id="submit" onclick="setValue()">Set</button>
-                <button id="value-reset" onclick="resetValue()">Reset</button>
-                <i class="flag fa-solid fa-flag" style="color: #ff0000"></i>
-                <span id="cell-flagged"></span>
-                <i
-                    class="question-mark fa-solid fa-question"
-                    style="color: #74c0fc"
-                ></i>
-                <span id="cell-suspected"></span> <br />
-                <strong id="bot-slider-desc">Bot Move Delay (minimum)</strong
-                ><br />
-                <div class="slidecontainer">
-                    <i class="fa-solid fa-rocket"></i>
-                    <input
-                        type="range"
-                        min="100"
-                        max="5000"
-                        value="1000"
-                        class="slider"
-                        id="myRange"
-                        oninput="displayValue(this.value)"
-                        onmousedown="showValue();"
-                        onmouseup="hideValue(); "
-                        step="100"
-                    />
-                    <i class="fa-solid fa-otter"></i>
-                    <div id="sliderValue" style="position: absolute"></div>
-                    <!-- Add this line -->
-                </div>
-                <div id="errMsg"></div>
+            <div class="second-line">
+                <a class="button information" href="information.html">Information</a>
+                <a class="button patch-note" href="README.md">Patch Notes</a>
             </div>
         </div>
-
-        <div class="board">
-            <div id="board"></div>
-        </div>
-
-        <div id="notification" class="notification">
-            <span
-                id="closebtn"
-                class="closebtn"
-                onclick="this.parentElement.style.display='none'; this.style.display = 'none';"
-                >&times;</span
-            >
-        </div>
-        <script src="JS/notification.js"></script>
-        <script src="JS/game.js"></script>
-        <script src="JS/playbot.js"></script>
+        <div class="version">v0.14</div>
     </body>
 </html>

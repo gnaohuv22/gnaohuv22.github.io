@@ -1,264 +1,143 @@
+/* Cool infinite background scrolling animation.
+ * Twitter: @kootoopas
+ */
+/* Exo thin font from Google. */
+@import url(https://fonts.googleapis.com/css?family=Exo:100);
+/* Background data (Original source: https://subtlepatterns.com/grid-me/) */
+/* Animations */
+@-webkit-keyframes bg-scrolling-reverse {
+    100% {
+        background-position: 50px 50px;
+    }
+}
+@-moz-keyframes bg-scrolling-reverse {
+    100% {
+        background-position: 50px 50px;
+    }
+}
+@-o-keyframes bg-scrolling-reverse {
+    100% {
+        background-position: 50px 50px;
+    }
+}
+@keyframes bg-scrolling-reverse {
+    100% {
+        background-position: 50px 50px;
+    }
+}
+@-webkit-keyframes bg-scrolling {
+    0% {
+        background-position: 50px 50px;
+    }
+}
+@-moz-keyframes bg-scrolling {
+    0% {
+        background-position: 50px 50px;
+    }
+}
+@-o-keyframes bg-scrolling {
+    0% {
+        background-position: 50px 50px;
+    }
+}
+@keyframes bg-scrolling {
+    0% {
+        background-position: 50px 50px;
+    }
+}
+/* Main styles */
 body {
-    background: #333;
-    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 13.5rem;
+    color: #797878;
+    font: 400 16px/1.5 exo, ubuntu, "segoe ui", helvetica, arial, sans-serif;
+    text-align: center;
+    /* img size is 50x50 */
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC")
+        repeat 0 0;
+    -webkit-animation: bg-scrolling-reverse 0.92s infinite;
+    /* Safari 4+ */
+    -moz-animation: bg-scrolling-reverse 0.92s infinite;
+    /* Fx 5+ */
+    -o-animation: bg-scrolling-reverse 0.92s infinite;
+    /* Opera 12+ */
+    animation: bg-scrolling-reverse 0.92s infinite;
+    /* IE 10+ */
+    -webkit-animation-timing-function: linear;
+    -moz-animation-timing-function: linear;
+    -o-animation-timing-function: linear;
+    animation-timing-function: linear;
     user-select: none; /* Standard syntax */
     -webkit-user-select: none; /* Chrome, Safari, and Opera syntax */
     -moz-user-select: none; /* Firefox syntax */
     -ms-user-select: none; /* IE syntax */
 }
+body::before {
+    content: "MINESWEEPER";
+    font-size: 8rem;
+    font-weight: 500;
+    font-style: normal;
+}
 
-.board {
-    display: flex;
-    justify-content: center;
-    height: max-content;
-    margin-top: 7vh;
-    margin-bottom: 10vh;
-    flex-wrap: nowrap;
-    text-wrap: nowrap;
-    overflow: visible;
+h1 {
+    color: aliceblue;
+    text-align: center;
+    font-size: 90px;
+    margin-top: 20vh;
 }
-.mine {
-    background: rgb(184, 44, 44);
-    transition: fade;
-    align-items: center;
-    justify-content: center;
-}
-.number {
-    background: rgb(234, 243, 103);
+
+a {
+    text-decoration: none;
     font-size: x-large;
 }
-.empty {
-    background: rgb(54, 160, 54);
-}
-.hidden {
-    background: gray;
-}
-.hidden:hover {
-    background: rgb(71, 71, 71);
-}
-.flagged {
-    background: rgb(224, 147, 4);
-}
 
-.flagged.fa-flag {
-    color: rgb(31, 108, 251);
-}
-
-.suspect {
-    background: #027bc7;
-}
-
-.suspect.fa-question {
-    color: #fd8438;
-}
-.true-flag {
-    background: pink;
-}
-
-.true-flag.fa-check {
-    color: #003f34;
-}
-
-.cell {
-    width: 35px;
-    height: 35px;
-    border: transparent;
-    border-radius: 4px;
-    margin: 1px;
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 40px;
-    font-weight: bold;
-    box-sizing: border-box;
-    transition: background .3s ease-in-out;
-}
-.control {
-    position: relative;
-    top: 2vw;
-    left: 2vw;
-    max-width: fit-content;
+.button-list {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
+    align-content: center;
 }
-.timer {
+
+.first-line,
+.second-line {
     display: flex;
     flex-direction: row;
-    align-items: center;
-}
-#reset,
-#reset-high-score,
-#playbot {
-    background: #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    margin-right: 10px;
-    border-radius: 6px;
-    border: 1px solid coral;
 }
 
-#reset:hover,
-#reset-high-score:hover,
-#playbot:hover {
-    background: #666;
-}
-#highScore,
-#timer {
-    background: #ccc;
-    padding: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border-radius: 6px;
+.button {
+    border: 1px solid beige;
+    padding: 35px;
+    margin: 30px;
+    text-align: center;
+    border-radius: 20px;
+    color: rgb(0, 0, 0);
+    font-weight: 700;
 }
 
-.difficulty {
-    background: #cec;
-    padding: 10px;
-    border-radius: 6px;
+.mode {
+    background: #0eb116;
 }
 
-.difficulty button {
-    border: none;
-    border-radius: 10px;
-    background-color: burlywood;
-    color: rgb(131, 90, 36);
-    padding: 10px;
-    cursor: pointer;
-}
-
-.difficulty button:hover {
-    background-color: rgb(160, 132, 96);
-    color: burlywood;
-}
-
-.slidecontainer {
-    width: 100%;
-    align-items: center;
-    display: flex;
-}
-
-strong {
-    padding-top: 10px;
-    padding-bottom: -20px;
-    display: flex;
-}
-
-.slider {
-    margin: 0 15px 0 15px;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 80%;
-    height: 10px;
-    border-radius: 5px;
-    background: #d3d3d3;
-    outline: none;
+.mode:hover,
+.hof:hover,
+.information:hover,
+.patch-note:hover {
     opacity: 0.7;
-    -webkit-transition: 0.5s;
-    transition: opacity 0.5s;
 }
 
-#sliderValue {
-    background-color: black;
-    opacity: 0.6;
-    color: white;
-    border-radius: 4px;
-    padding: 6px 15px;
-    display: none;
-    backdrop-filter: contrast(2px);
+.hof {
+    background: #f3e40d;
 }
 
-.slider:hover {
-    opacity: 1;
+.information {
+    background: #297ddd;
 }
 
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: #04aa6d;
-    cursor: pointer;
+.patch-note {
+    background: #ff3030;
 }
 
-.slider::-moz-range-thumb {
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    border-radius: 50%;
-    background: #04aa6d; /* Green background */
-    cursor: pointer; /* Cursor on hover */
-}
-
-.slider-set-button {
-    padding: 10px;
-}
-#value-reset {
-    background-color: #1d4c5e;
-    color: #f5f5dc; /* Beige */
-    border: 1px solid #f5f5dc; /* Beige */
-}
-
-#value-reset:hover {
-    background-color: #f5f5dc; /* Beige */
-    color: #1d4c5e;
-    border: 1px solid #1d4c5e;
-}
-
-.difficulty #mine,
-.difficulty #size {
-    border: none;
-    border-radius: 6px;
-    box-shadow: 1px 1px 2px #eee;
-    padding: 10px;
-    margin-right: 5px;
-}
-
-.hall-of-fame {
-    position: relative;
-    top: 2vw;
-    right: -90vw;
-    max-width: fit-content;
-    align-items: center;
-}
-
-.hall-of-fame a {
-    color: #e0ecde;
-}
-
-.hall-of-fame a:hover {
-    color: #2c6975;
-}
-.flag,
-.question-mark {
-    margin: 0 10px 0 20px;
-}
-
-#notification {
-    display: none;
-    min-width: 250px; /* Set a default minimum width */
-    background-color: rgba(42, 223, 81, 0.8); /* Black background color */
-    color: #fff; /* White text color */
-    text-align: center; /* Centered text */
-    border-radius: 6px; /* Rounded borders */
-    padding: 16px; /* Padding */
-    position: fixed; /* Sit on top of the screen */
-    z-index: 1; /* Add a z-index if needed */
-    right: 20px; /* 20px from the right */
-    top: 30px; /* 30px from the top */
-}
-
-.closebtn {
-    margin-left: 15px;
-    color: #fff;
-    font-weight: bold;
-    float: right;
-    font-size: 22px;
-    line-height: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-    display: block;
-}
-
-.closebtn:hover {
-    color: black;
+.version {
+    font-weight: 500;
 }
