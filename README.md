@@ -1,9 +1,18 @@
+**Project Overview**:
+- **Name**: Minesweeper
+- **Languages**: HTML, CSS, JavaScript
+- **Author**: gnaohuv
+
+**Recent Updates (v0.14.1)**:
+- **Added**: New features to save user configurations in classic mode.
+- **Modified**: Improved JS file structure and added titles for icons.
+- **Fixed**: Bug preventing cell reveal after winning.
+
+You can access the game by visiting [this link](https://gnaohuv22.github.io/index.html). Enjoy playing! 🎮
+
 # PATCH NOTES
 
 #### This documentation shows the changes made to the current project: Minesweeper
-
-##### Language: HTML, CSS, JavaScript
-##### Author: gnaohuv
 
 ## CHANGE LOG
 
